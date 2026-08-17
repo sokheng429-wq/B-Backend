@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: bgroceries-backend
+  # prod = Neon PostgreSQL (the real database). dev = H2 in-memory, zero setup.
+  profiles:
+    active: prod
+
+server:
+  port: 8081
+
+app:
+  jwt:
+    # CHANGE THIS SECRET before deploying to production (min 32 chars).
+    secret: ${JWT_SECRET:bgroceries-super-secret-key-change-this-in-production-min-32-chars}
+    access-token-expiration-ms: ${JWT_ACCESS_EXPIRATION_MS:86400000}   # 24 hours
+    reset-token-expiration-ms: ${JWT_RESET_EXPIRATION_MS:600000}       # 10 minutes
+  otp:
+    length: 6
+    expiry-minutes: 5
+    max-attempts: 5
+    expose-in-response: ${OTP_EXPOSE_IN_RESPONSE:false}
