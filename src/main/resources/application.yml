@@ -4,6 +4,31 @@ spring:
   # prod = Neon PostgreSQL (the real database). dev = H2 in-memory, zero setup.
   profiles:
     active: prod
+  # Outbound HTTP (used by the social login verifiers to reach Google/Facebook).
+  http:
+    client:
+      connect-timeout: 5s
+      read-timeout: 5s
+  # Spring Security OAuth2 Client (for server-side OAuth2 flow)
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 457341066065-0ja001e981hnhhe92uffiu7cbqpg6q1v.apps.googleusercontent.com
+            client-secret: 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
+            scope: email,profile
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+          facebook:
+            client-id: ${FACEBOOK_APP_ID:1352113810463033}
+            client-secret: ${FACEBOOK_APP_SECRET:e64907e71514d2f8b2f5af4b3c060eda}
+            scope: email,public_profile
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+        provider:
+          facebook:
+            authorization-uri: https://www.facebook.com/v21.0/dialog/oauth
+            token-uri: https://graph.facebook.com/v21.0/oauth/access_token
+            user-info-uri: https://graph.facebook.com/me?fields=id,name,email,picture
 
 server:
   port: 8081
@@ -19,3 +44,17 @@ app:
     expiry-minutes: 5
     max-attempts: 5
     expose-in-response: ${OTP_EXPOSE_IN_RESPONSE:false}
+  # OAuth2 redirect URI — where to send the user after successful social login with JWT token
+  oauth2:
+    redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:5173/oauth2/redirect}
+  social:
+    # Real OAuth credentials. Placeholders below mean "not configured" -> social login
+    # with a token fails with 401 until real values are supplied via env vars.
+    google:
+      client-id: 457341066065-0ja001e981hnhhe92uffiu7cbqpg6q1v.apps.googleusercontent.com
+    facebook:
+      app-id: ${FACEBOOK_APP_ID:1352113810463033}
+      app-secret: ${FACEBOOK_APP_SECRET:e64907e71514d2f8b2f5af4b3c060eda}
+      graph-version: ${FACEBOOK_GRAPH_VERSION:v21.0}
+    telegram:
+      bot-token: ${TELEGRAM_BOT_TOKEN:8953064860:AAECU4pZPZaOMZ2SInNSotSNbZA9V8M-KWU}

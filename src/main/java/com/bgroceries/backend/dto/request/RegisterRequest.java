@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -37,4 +39,11 @@ public class RegisterRequest {
 
     @NotBlank(message = "Confirm password is required")
     private String confirmPassword;
+
+    // Optional profile fields
+    private LocalDate dateOfBirth;
+
+    private String gender;  // "Male", "Female", "Other"
+
+    private String nationality;
 }

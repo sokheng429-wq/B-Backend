@@ -69,18 +69,22 @@ The build was broken on this machine; both issues are now worked around in the r
 Layered Spring Boot app, all under `com.bgroceries.backend`. The whole API surface is a
 single controller:
 
-- `controller/AuthController` — 7 `POST` endpoints under `/api/auth`: `register`, `login`,
-  `login/otp/send`, `login/otp/verify`, `forgot-password/send-otp`,
+- `controller/AuthController` — 8 `POST` endpoints under `/api/auth`: `register`, `login`,
+  `social`, `login/otp/send`, `login/otp/verify`, `forgot-password/send-otp`,
   `forgot-password/verify-otp`, `forgot-password/reset`. Returns `ApiResponse<T>`
   `{success, message, data}` envelopes.
 - `service/AuthService` — orchestrates the flows: normalizes phone, validates password
   match, resolves the login identifier across username → full name → email → telegram →
   facebook (phone also still works), delegates OTP work, builds `AuthResponse` with a JWT.
-  `socialLogin()` finds-or-creates the account per provider (gmail/telegram/facebook) —
-  SIMULATED for now: the identifier is trusted as-is, no real OAuth handshake. Social users
-  get a random BCrypt password and no phone; their JWT subject is the username, and
-  `CustomUserDetailsService` falls back to username lookup. Wire real Google/Facebook OAuth +
-  Telegram Login Widget before production. `@Transactional` on write flows.
+  `socialLogin()` REAL OAuth when the request carries a `token`: it picks the matching
+  `SocialVerifier` (see `social/` below), which cryptographically verifies the provider
+  credential, then find-or-creates the account by provider id (`google_id`/`facebook_id`/
+  `telegram_id`) or provider-verified email. Without a token it keeps the SIMULATED demo
+  behavior: one-click demo accounts per provider (`gmail.demo@bgroceries.demo` /
+  `telegram.demo` / `facebook.demo`, display names "Google/Telegram/Facebook User") when
+  `identifier` is omitted, else legacy identifier lookup. Social users get a random BCrypt
+  password and no phone; their JWT subject is the username, and `CustomUserDetailsService`
+  falls back to username lookup. `@Transactional` on write flows.
 - `service/OtpService` — generates a numeric code, persists a BCrypt **hash** (`OtpCode`
   row keyed by phone + `OtpPurpose` LOGIN/RESET_PASSWORD), sends via `SmsService`, and
   verifies (expiry, max attempts, BCrypt match, marks used). Returns the raw code only when
@@ -88,6 +92,17 @@ single controller:
 - `service/SmsService` → `service/impl/ConsoleSmsServiceImpl` — SMS is behind an interface;
   the only impl logs the code (dev). Wire a real Cambodian gateway impl before prod; only
   one `SmsService` bean may exist.
+- `social/` — real social-login verification. `SocialVerifier` interface + one `@Component`
+  per provider: `GoogleSocialVerifier` (provider `"gmail"`; verifies Google ID tokens
+  against `https://www.googleapis.com/oauth2/v3/certs` via jjwt `Jwks`/`Locator`, 1h JWKS
+  cache, requires `aud` = client id + `email_verified`), `FacebookSocialVerifier`
+  (Graph API `debug_token` with app token `appId|appSecret` + profile fetch), and
+  `TelegramSocialVerifier` (Login Widget `auth` JSON; official HMAC-SHA256 with key
+  `SHA256(botToken)`; rejects `auth_date` older than 24h). All fail with an opaque 401
+  "Invalid provider token". Credentials come from `app.social.*` (env vars); placeholder
+  values (`your-...`) fail safe before any network call. `AuthService` injects the beans
+  as `List<SocialVerifier>`. **RestClient-based; no `oauth2-client` dependency** (the
+  corrupted spring-security-web jars forbid it).
 - `security/` — `JwtUtil` (jjwt 0.12; generates ACCESS tokens — 24 h, claims `type=ACCESS`,
   `userId` — and short-lived RESET tokens — 10 min, `type=RESET`), `JwtAuthFilter`
   (implements `jakarta.servlet.Filter`; requires `type=ACCESS` Bearer token, loads user by
@@ -101,9 +116,12 @@ single controller:
   generic 500.
 - `entity/` — `User` (login identifiers: `username`, `fullName`, `email`, `telegram`,
   `facebook`, all unique where sensible; `phoneNumber` unique and required; `passwordHash`,
-  `enabled`, auto timestamps) and `OtpCode`. `repository/` — Spring Data JPA interfaces;
-  note the OTP lookup `findTopByPhoneNumberAndPurposeAndUsedFalseOrderByCreatedAtDesc` and
-  the identifier lookups (`findByUsernameIgnoreCase`, `findByEmailIgnoreCase`, etc.).
+  `enabled`, auto timestamps; plus nullable unique provider ids `googleId`/`facebookId`/
+  `telegramId` used by real social login) and `OtpCode`. `repository/` — Spring Data JPA
+  interfaces; note the OTP lookup
+  `findTopByPhoneNumberAndPurposeAndUsedFalseOrderByCreatedAtDesc`, the identifier lookups
+  (`findByUsernameIgnoreCase`, `findByEmailIgnoreCase`, etc.), and the provider-id lookups
+  (`findByGoogleId`, `findByFacebookId`, `findByTelegramId`).
 - `config/` — `SecurityConfig` (stateless, CSRF off, `@EnableMethodSecurity`, permits
   `/api/auth/**` + `/h2-console/**`, requires `ROLE_ADMIN` for `/api/admin/**`, everything
   else authenticated), `CorsConfig` (the `CorsConfigurationSource` bean — wide open for the
@@ -114,7 +132,8 @@ single controller:
   `UPDATE users SET role='ADMIN' WHERE ...` in Neon.
 - `util/PhoneUtil` — canonicalizes all input formats (`012...`, `855...`, `+855...`) to
   `+855XXXXXXXXX` before any DB lookup/insert. Always normalize phone numbers in new code.
-- Config: `application.yml` (base: dev profile active, `app.jwt.*`, `app.otp.*` settings),
+- Config: `application.yml` (base: prod profile active by default, `app.jwt.*`, `app.otp.*`,
+  `app.social.*` settings, `spring.http.client.*` timeouts for the social verifiers),
   `application-dev.yml` (H2, `ddl-auto: update`, `show-sql: true`,
   `otp.expose-in-response: true`), `application-prod.yml` (PostgreSQL from env vars,
   `expose-in-response: false`).

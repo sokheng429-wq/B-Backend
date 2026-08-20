@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -49,9 +50,35 @@ public class User {
     @Column(unique = true, length = 100)
     private String facebook;
 
+    /** Stable Google account id from a verified ID token (nullable). */
+    @Column(name = "google_id", unique = true, length = 100)
+    private String googleId;
+
+    /** Stable Facebook account id from a verified access token (nullable). */
+    @Column(name = "facebook_id", unique = true, length = 100)
+    private String facebookId;
+
+    /** Stable Telegram account id from a verified Login Widget auth (nullable). */
+    @Column(name = "telegram_id", unique = true, length = 100)
+    private String telegramId;
+
+    /** Track which OAuth provider was used for login: "google", "facebook", "telegram", or null for password login */
+    @Column(name = "login_provider", length = 20)
+    private String loginProvider;
+
     /** Nullable: social-media accounts (gmail/telegram/facebook) sign up without a phone. */
     @Column(name = "phone_number", nullable = true, unique = true, length = 20)
     private String phoneNumber;
+
+    /** Optional profile details (Account Details page). Nullable for existing rows. */
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+
+    @Column(name = "gender", length = 20)
+    private String gender;
+
+    @Column(name = "nationality", length = 100)
+    private String nationality;
 
     /** USER or ADMIN. Nullable for legacy rows; treat null as USER. */
     @Column(name = "role", length = 20)

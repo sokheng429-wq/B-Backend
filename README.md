@@ -129,6 +129,33 @@ state/localStorage for the last step below.
 ```
 → `200 OK`, `{ success: true, message: "Password reset successfully" }`.
 
+### 8. Social login (Google / Telegram / Facebook)
+`POST /social`
+```json
+{ "provider": "gmail", "token": "<Google ID token>" }
+```
+→ `200 OK`, returns `{ token, tokenType, user }`.
+
+`token` is the provider-issued credential, verified **server-side**:
+
+- **gmail** — a Google ID token (JWT) from Google Identity Services. The backend
+  checks the signature against Google's JWKS, `aud` matches the configured client id,
+  and `email_verified=true`.
+- **facebook** — a user access token from the Facebook JS SDK. Verified against
+  `https://graph.facebook.com/{version}/debug_token` and the profile fetched.
+- **telegram** — the Login Widget `auth` object serialized as JSON, e.g.
+  `{"id":123,"first_name":"X","last_name":"Y","username":"xy","auth_date":1515957854,"hash":"..."}`.
+  Verified with the official HMAC-SHA256 algorithm (keyed by `SHA256(bot_token)`).
+
+Accounts are linked by the provider's stable id (`google_id` / `facebook_id` /
+`telegram_id`); a provider-verified email also links an existing account. First login
+creates the account. If `token` is absent, the legacy simulated demo behavior applies
+(stable demo account per provider, or the optional `identifier`).
+
+Credentials are configured via env vars (`GOOGLE_CLIENT_ID`, `FACEBOOK_APP_ID`,
+`FACEBOOK_APP_SECRET`, `TELEGRAM_BOT_TOKEN`). Until real values are set, any request
+with a `token` fails with `401 Invalid provider token`.
+
 ---
 
 ## Notes

@@ -1,5 +1,6 @@
 package com.bgroceries.backend.dto.response;
 
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,4 +21,10 @@ public class UserResponse {
     private String facebook;
     private String phoneNumber;
     private String role;
+    private LocalDate dateOfBirth;
+    private String gender;
+    private String nationality;
+
+    /** Which OAuth provider was used for login: "google", "facebook", "telegram", or null for password login */
+    private String loginProvider;
 }

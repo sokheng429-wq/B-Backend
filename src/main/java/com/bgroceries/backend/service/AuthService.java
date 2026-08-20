@@ -18,10 +18,13 @@ import com.bgroceries.backend.exception.NotFoundException;
 import com.bgroceries.backend.exception.UnauthorizedException;
 import com.bgroceries.backend.repository.UserRepository;
 import com.bgroceries.backend.security.JwtUtil;
+import com.bgroceries.backend.social.SocialProfile;
+import com.bgroceries.backend.social.SocialVerifier;
 import com.bgroceries.backend.util.PhoneUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +40,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final OtpService otpService;
+    private final List<SocialVerifier> socialVerifiers;
 
     @Value("${app.jwt.reset-token-expiration-ms}")
     private long resetTokenExpirationMs;
@@ -71,6 +75,9 @@ public class AuthService {
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .role("USER")
                 .enabled(true)
+                .dateOfBirth(request.getDateOfBirth())
+                .gender(request.getGender())
+                .nationality(request.getNationality())
                 .build();
 
         userRepository.save(user);
@@ -94,42 +101,56 @@ public class AuthService {
     // ---------- Social login (Gmail / Telegram / Facebook) ----------
 
     /**
-     * Simulated social login: the provider identifier acts as the credential.
-     * Finds the account by provider, or auto-creates one if none exists.
-     * NOTE: no real OAuth handshake happens here — wire up Google/Facebook OAuth
-     * and the Telegram Login Widget before production, then verify the identifier
-     * came from the provider instead of trusting the request body.
+     * Real social login: when the request carries a {@code token}, the matching
+     * {@link SocialVerifier} cryptographically verifies it and the account is
+     * linked by provider id (or verified email) / created on first login.
+     * Without a token, falls back to the simulated find-or-create demo behavior.
      */
     @Transactional
     public AuthResponse socialLogin(SocialLoginRequest request) {
+        if (request.getToken() != null && !request.getToken().isBlank()) {
+            SocialVerifier verifier = findSocialVerifier(request.getProvider());
+            SocialProfile profile = verifier.verify(request.getToken());
+            User user = findOrCreateSocialUser(profile);
+            return buildAuthResponse(user);
+        }
+
+        // ----- Simulated demo path (no real OAuth handshake) -----
         String provider = request.getProvider() == null ? "" : request.getProvider().trim().toLowerCase();
         String identifier = request.getIdentifier() == null ? "" : request.getIdentifier().trim();
 
         User user;
         switch (provider) {
             case "gmail" -> {
-                String email = identifier.toLowerCase();
+                // Empty identifier -> one-click demo account; repeated clicks map to the same user.
+                boolean demo = identifier.isEmpty();
+                String email = demo ? "gmail.demo@bgroceries.demo" : identifier.toLowerCase();
                 if (!email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
                     throw new BadRequestException("Invalid email address");
                 }
+                String demoName = demo ? "Google User" : null;
                 user = userRepository.findByEmailIgnoreCase(email)
-                        .orElseGet(() -> createSocialUser(null, email, null, null));
+                        .orElseGet(() -> createSocialUser(demoName, email, null, null));
             }
             case "telegram" -> {
-                String telegram = identifier.replaceAll("^@", "");
+                boolean demo = identifier.isEmpty();
+                String telegram = demo ? "telegram.demo" : identifier.replaceAll("^@", "");
                 if (telegram.isEmpty()) {
                     throw new BadRequestException("Telegram handle is required");
                 }
+                String demoName = demo ? "Telegram User" : null;
                 user = userRepository.findByTelegram(telegram)
-                        .orElseGet(() -> createSocialUser(null, null, telegram, null));
+                        .orElseGet(() -> createSocialUser(demoName, null, telegram, null));
             }
             case "facebook" -> {
-                String facebook = identifier.replaceAll("^@", "");
+                boolean demo = identifier.isEmpty();
+                String facebook = demo ? "facebook.demo" : identifier.replaceAll("^@", "");
                 if (facebook.isEmpty()) {
                     throw new BadRequestException("Facebook handle is required");
                 }
+                String demoName = demo ? "Facebook User" : null;
                 user = userRepository.findByFacebook(facebook)
-                        .orElseGet(() -> createSocialUser(null, null, null, facebook));
+                        .orElseGet(() -> createSocialUser(demoName, null, null, facebook));
             }
             default -> throw new BadRequestException("Unsupported provider. Use gmail, telegram or facebook");
         }
@@ -149,6 +170,69 @@ public class AuthService {
                 .telegram(telegram)
                 .facebook(facebook)
                 // Social accounts have no real password; store an unguessable random one.
+                .passwordHash(passwordEncoder.encode(UUID.randomUUID().toString()))
+                .role("USER")
+                .enabled(true)
+                .build();
+
+        userRepository.save(user);
+        return user;
+    }
+
+    // ---------- Verified social login: find-or-create from a SocialProfile ----------
+
+    private SocialVerifier findSocialVerifier(String provider) {
+        return socialVerifiers.stream()
+                .filter(v -> v.provider().equalsIgnoreCase(provider))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException("Unsupported provider. Use gmail, telegram or facebook"));
+    }
+
+    private User findOrCreateSocialUser(SocialProfile profile) {
+        User user = findByProviderId(profile);
+        if (user == null && profile.email() != null) {
+            // Provider-verified email linking (Google/Facebook only; Telegram sends no email).
+            user = userRepository.findByEmailIgnoreCase(profile.email()).orElse(null);
+            if (user != null) {
+                stampProviderId(user, profile);
+                userRepository.save(user);
+            }
+        }
+        return user != null ? user : createSocialProfileUser(profile);
+    }
+
+    private User findByProviderId(SocialProfile profile) {
+        return switch (profile.provider()) {
+            case "gmail" -> userRepository.findByGoogleId(profile.providerId()).orElse(null);
+            case "facebook" -> userRepository.findByFacebookId(profile.providerId()).orElse(null);
+            case "telegram" -> userRepository.findByTelegramId(profile.providerId()).orElse(null);
+            default -> null;
+        };
+    }
+
+    private void stampProviderId(User user, SocialProfile profile) {
+        switch (profile.provider()) {
+            case "gmail" -> user.setGoogleId(profile.providerId());
+            case "facebook" -> user.setFacebookId(profile.providerId());
+            case "telegram" -> user.setTelegramId(profile.providerId());
+            default -> throw new BadRequestException("Unsupported provider. Use gmail, telegram or facebook");
+        }
+    }
+
+    private User createSocialProfileUser(SocialProfile profile) {
+        String base = profile.fullName() != null ? profile.fullName()
+                : profile.email() != null ? profile.email().split("@")[0]
+                : profile.telegramUsername() != null ? profile.telegramUsername()
+                : profile.provider() + "-" + profile.providerId();
+
+        User user = User.builder()
+                .username(uniqueUsername(base))
+                .fullName(profile.fullName() != null ? profile.fullName() : toDisplayName(base))
+                .email(profile.email())
+                .telegram(profile.telegramUsername())
+                .googleId("gmail".equals(profile.provider()) ? profile.providerId() : null)
+                .facebookId("facebook".equals(profile.provider()) ? profile.providerId() : null)
+                .telegramId("telegram".equals(profile.provider()) ? profile.providerId() : null)
                 .passwordHash(passwordEncoder.encode(UUID.randomUUID().toString()))
                 .role("USER")
                 .enabled(true)

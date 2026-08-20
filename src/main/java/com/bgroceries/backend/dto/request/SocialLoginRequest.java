@@ -16,7 +16,23 @@ public class SocialLoginRequest {
     @NotBlank(message = "Provider is required")
     private String provider;
 
-    /** The user's email (gmail), telegram handle or facebook handle. */
-    @NotBlank(message = "Identifier is required")
+    /**
+     * Optional. When blank, a stable demo account per provider is used
+     * (one-click social login without an identity prompt).
+     */
     private String identifier;
+
+    /**
+     * Optional. The provider-issued credential for REAL social login, verified
+     * server-side. Format depends on the provider:
+     * <ul>
+     *   <li>{@code gmail}: Google ID token (JWT from Google Identity Services)</li>
+     *   <li>{@code facebook}: Facebook user access token (from the JS SDK)</li>
+     *   <li>{@code telegram}: JSON string of the Login Widget {@code auth} object
+     *       ({@code id, first_name, last_name, username, photo_url, auth_date, hash})</li>
+     * </ul>
+     * When present it takes precedence over {@code identifier}. When absent, the
+     * legacy demo-account behavior applies.
+     */
+    private String token;
 }

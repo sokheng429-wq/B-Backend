@@ -77,7 +77,9 @@
       "Bash(\"D:\\\\1.B.Groceries\\\\Frontend\\\\B-Frontend\\\\src\\\\Pages\\\\Auth\\\\Register.css\":*)",
       "Bash(timeout 240 mvn clean test)",
       "Edit",
-      "Bash"
+      "Bash",
+      "WebSearch",
+      "WebFetch(domain:core.telegram.org)"
     ]
   }
 }
