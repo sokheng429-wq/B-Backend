@@ -62,6 +62,10 @@ public class User {
     @Column(name = "telegram_id", unique = true, length = 100)
     private String telegramId;
 
+    /** Numeric Telegram user ID from bot login (nullable). */
+    @Column(name = "telegram_user_id", unique = true)
+    private Long telegramUserId;
+
     /** Track which OAuth provider was used for login: "google", "facebook", "telegram", or null for password login */
     @Column(name = "login_provider", length = 20)
     private String loginProvider;

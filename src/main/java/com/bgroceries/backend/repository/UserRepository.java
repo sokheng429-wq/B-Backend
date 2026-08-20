@@ -33,5 +33,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByTelegramId(String telegramId);
 
+    Optional<User> findByTelegramUserId(Long telegramUserId);
+
     Optional<User> findByFullNameIgnoreCase(String fullName);
 }

@@ -45,6 +45,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/telegram/webhook").permitAll()  // Telegram bot webhook
                         .requestMatchers("/api/oauth2/**").permitAll()  // OAuth2 test endpoints
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()  // OAuth2 endpoints

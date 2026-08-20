@@ -58,3 +58,9 @@ app:
       graph-version: ${FACEBOOK_GRAPH_VERSION:v21.0}
     telegram:
       bot-token: ${TELEGRAM_BOT_TOKEN:8953064860:AAECU4pZPZaOMZ2SInNSotSNbZA9V8M-KWU}
+  telegram:
+    bot:
+      token: ${TELEGRAM_BOT_TOKEN:8953064860:AAECU4pZPZaOMZ2SInNSotSNbZA9V8M-KWU}
+      username: ${TELEGRAM_BOT_USERNAME:B'GroceriesBot}
+    webhook:
+      secret: ${TELEGRAM_WEBHOOK_SECRET:https://shaggy-socks-shout.loca.lt}

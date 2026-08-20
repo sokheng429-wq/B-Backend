@@ -1,5 +1,7 @@
+com\bgroceries\backend\controller\TelegramWebhookController.class
 com\bgroceries\backend\social\FacebookSocialVerifier.class
 com\bgroceries\backend\exception\UnauthorizedException.class
+com\bgroceries\backend\controller\TelegramAuthController.class
 com\bgroceries\backend\entity\OtpCode$OtpCodeBuilder.class
 com\bgroceries\backend\dto\request\UpdateProfileRequest.class
 com\bgroceries\backend\social\GoogleSocialVerifier.class
@@ -13,9 +15,11 @@ com\bgroceries\backend\dto\request\RegisterRequest.class
 com\bgroceries\backend\dto\response\AuthResponse.class
 com\bgroceries\backend\service\AuthService.class
 com\bgroceries\backend\exception\GlobalExceptionHandler.class
+com\bgroceries\backend\entity\LoginSession$LoginSessionBuilder.class
 com\bgroceries\backend\social\SocialVerifier.class
 com\bgroceries\backend\dto\response\ResetTokenResponse.class
 com\bgroceries\backend\dto\request\LoginRequest.class
+com\bgroceries\backend\repository\LoginSessionRepository.class
 com\bgroceries\backend\controller\UserController.class
 com\bgroceries\backend\exception\ConflictException.class
 com\bgroceries\backend\security\oauth\OAuth2LoginSuccessHandler.class
@@ -24,7 +28,9 @@ com\bgroceries\backend\dto\response\OtpSentResponse$OtpSentResponseBuilder.class
 com\bgroceries\backend\security\oauth\CustomOAuth2User.class
 com\bgroceries\backend\dto\request\VerifyOtpRequest.class
 com\bgroceries\backend\repository\UserRepository.class
+com\bgroceries\backend\service\TelegramService.class
 com\bgroceries\backend\service\UserService.class
+com\bgroceries\backend\entity\LoginSession.class
 com\bgroceries\backend\config\DataInitializer.class
 com\bgroceries\backend\util\PhoneUtil.class
 com\bgroceries\backend\exception\ApiException.class

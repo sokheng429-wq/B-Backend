@@ -394,6 +394,9 @@ public class AuthService {
                 .facebook(user.getFacebook())
                 .phoneNumber(user.getPhoneNumber())
                 .role(role)
+                .dateOfBirth(user.getDateOfBirth())
+                .gender(user.getGender())
+                .nationality(user.getNationality())
                 .build();
 
         return AuthResponse.builder()
