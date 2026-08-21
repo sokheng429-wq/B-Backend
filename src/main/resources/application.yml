@@ -9,6 +9,20 @@ spring:
     client:
       connect-timeout: 5s
       read-timeout: 5s
+  # Email (forgot-password OTP delivery). Gmail SMTP works locally; set
+  # GMAIL_SMTP_USERNAME / GMAIL_SMTP_PASSWORD (an App Password) to actually send.
+  # Empty defaults -> SmtpEmailServiceImpl falls back to the console log.
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL_SMTP_USERNAME:b.groceriesdev@gmail.com}
+    password: ${GMAIL_SMTP_PASSWORD:doemwmgxjzazndap}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   # Spring Security OAuth2 Client (for server-side OAuth2 flow)
   security:
     oauth2:
@@ -41,8 +55,8 @@ app:
     reset-token-expiration-ms: ${JWT_RESET_EXPIRATION_MS:600000}       # 10 minutes
   otp:
     length: 6
-    expiry-minutes: 5
-    max-attempts: 5
+    expiry-minutes: 2
+    max-attempts: 2
     expose-in-response: ${OTP_EXPOSE_IN_RESPONSE:false}
   # OAuth2 redirect URI — where to send the user after successful social login with JWT token
   oauth2:

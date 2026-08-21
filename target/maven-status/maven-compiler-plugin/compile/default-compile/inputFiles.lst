@@ -6,6 +6,7 @@ D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\config\S
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\AuthController.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\OAuth2DiagnosticController.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\OAuth2TestController.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\PasswordResetController.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\TelegramAuthController.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\TelegramWebhookController.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\UserController.java
@@ -23,6 +24,7 @@ D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\resp
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\response\UserResponse.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\LoginSession.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\OtpCode.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\PasswordResetOtp.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\User.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\enums\OtpPurpose.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\exception\ApiException.java
@@ -33,6 +35,7 @@ D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\exceptio
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\exception\UnauthorizedException.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\LoginSessionRepository.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\OtpCodeRepository.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\PasswordResetOtpRepository.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\UserRepository.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\security\CustomUserDetailsService.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\security\JwtAuthFilter.java
@@ -42,7 +45,9 @@ D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\security
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\security\oauth\OAuth2LoginFailureHandler.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\security\oauth\OAuth2LoginSuccessHandler.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\AuthService.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\EmailService.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\impl\ConsoleSmsServiceImpl.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\impl\SmtpEmailServiceImpl.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\OtpService.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\SmsService.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\TelegramService.java
