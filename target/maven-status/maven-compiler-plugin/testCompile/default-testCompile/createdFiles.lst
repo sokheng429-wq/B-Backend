@@ -1,6 +1,9 @@
-com\bgroceries\backend\service\AuthServiceSocialTest.class
+com\bgroceries\backend\service\JobServiceTest.class
 com\bgroceries\backend\service\AuthServiceSocialTest$FakeVerifier.class
-com\bgroceries\backend\social\FacebookSocialVerifierTest.class
-com\bgroceries\backend\BackendApplicationTests.class
 com\bgroceries\backend\social\GoogleSocialVerifierTest.class
 com\bgroceries\backend\social\TelegramSocialVerifierTest.class
+com\bgroceries\backend\service\AuthServiceSocialTest.class
+com\bgroceries\backend\service\JobApplicationServiceTest.class
+com\bgroceries\backend\service\MemberServiceTest.class
+com\bgroceries\backend\social\FacebookSocialVerifierTest.class
+com\bgroceries\backend\BackendApplicationTests.class

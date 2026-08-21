@@ -1,5 +1,8 @@
 D:\1.B.Groceries\Backend\B-backend\src\test\java\com\bgroceries\backend\BackendApplicationTests.java
 D:\1.B.Groceries\Backend\B-backend\src\test\java\com\bgroceries\backend\service\AuthServiceSocialTest.java
+D:\1.B.Groceries\Backend\B-backend\src\test\java\com\bgroceries\backend\service\JobApplicationServiceTest.java
+D:\1.B.Groceries\Backend\B-backend\src\test\java\com\bgroceries\backend\service\JobServiceTest.java
+D:\1.B.Groceries\Backend\B-backend\src\test\java\com\bgroceries\backend\service\MemberServiceTest.java
 D:\1.B.Groceries\Backend\B-backend\src\test\java\com\bgroceries\backend\social\FacebookSocialVerifierTest.java
 D:\1.B.Groceries\Backend\B-backend\src\test\java\com\bgroceries\backend\social\GoogleSocialVerifierTest.java
 D:\1.B.Groceries\Backend\B-backend\src\test\java\com\bgroceries\backend\social\TelegramSocialVerifierTest.java

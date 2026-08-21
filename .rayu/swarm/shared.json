@@ -1,0 +1,66 @@
+{
+  "goal": "Jobs + Applications full-stack feature: admin job CRUD in AdminD (Addjobs wired to the API), public Career list/detail rendered from real data, public Apply with base64 resume, and an admin Applications report with status workflow (NEW/REVIEWED/ACCEPTED/REJECTED).",
+  "stack": "Spring Boot 3.3.4 / Java 17 / Spring Data JPA (H2 dev, Neon PostgreSQL prod) + React 19 / Vite / Tailwind / react-router-dom 7. Auth: existing JwtAuthFilter — /api/admin/** hasRole(ADMIN), /api/public/** permitAll (SecurityConfig already covers both; NO security changes). Follow the proven Member Management pattern (entity/repository/dto/service/controller + ApiResponse envelope).",
+  "flow": "Admin: GET/POST/PUT/DELETE /api/admin/jobs (JobDto), GET /api/admin/applications, GET /api/admin/applications/{id}, PATCH /api/admin/applications/{id}/status {status}, DELETE /api/admin/applications/{id}. Public: GET /api/public/jobs, GET /api/public/jobs/{id}, POST /api/public/jobs/{id}/apply (JobApplicationDto {jobId,fullName,email,phone,linkedinUrl,coverLetter,resumeName,resumeData,resumeContentType} -> status NEW). Job detail route /career-detail/:id (state fallback); apply route /apply-now?job=<id>. Resume = base64 TEXT + filename + content type in DB; admin view opens it as a data URI. Deleting a job that has applications fails with ConflictException (no cascade).",
+  "constraints": [
+    "Do NOT import org.springframework.security.web.filter.* or org.springframework.security.web.cors.* (corrupted jar on this machine) — new code needs none; leave SecurityConfig untouched.",
+    "Always `mvn clean` before test/run (stale target/ poisons builds with Unresolved compilation problems); Lombok/JDK fixes live in pom.xml — do not change it.",
+    "Wrap every endpoint in ApiResponse {success,message,data}; throw ApiException subclasses (NotFoundException/BadRequestException/ConflictException) from services; @Transactional on writes.",
+    "Field names are part of the API contract (job: title/department/location/type/salary/description/requirements/benefits; application: jobId/fullName/email/phone/linkedinUrl/coverLetter/resumeName/resumeData/resumeContentType/status) — do not rename.",
+    "Job multi-line fields are line-oriented: JobDto.description line 1 = Job Overview paragraph, lines 2+ = Key Responsibilities bullets; requirements/benefits lines = bullet lists on Careerdetail.",
+    "Status is a String column limited to NEW/REVIEWED/ACCEPTED/REJECTED; reject anything else with BadRequestException.",
+    "Resume: frontend caps file at ~2MB; backend rejects resumeData > ~5M chars with BadRequestException (TEXT column, like member photos).",
+    "AdminD: jobs and applications are ADMIN-only — add '/admin/applications' to the adminOnly list and a new sidebar item (Management section); Applications.jsx is a single list+detail page (no extra route).",
+    "Deleting a job that has applications must fail with ConflictException — do not cascade-delete applications."
+  ],
+  "needs": ["frontend", "backend", "security"],
+  "cap": 5,
+  "slices": {
+    "backend": [
+      {
+        "name": "backend-jobs",
+        "task": "Job entity (TEXT columns for description/requirements/benefits, @PrePersist/@PreUpdate timestamps like Member) + JobRepository + JobDto (combined, @NotBlank title/department/location/type) + JobService (CRUD, NotFoundException; delete throws ConflictException when applications exist) + JobController /api/admin/jobs + PublicJobController GET /api/public/jobs and /{id} (full safe fields).",
+        "area": "src/main/java/com/bgroceries/backend/entity/Job.java, src/main/java/com/bgroceries/backend/repository/JobRepository.java, src/main/java/com/bgroceries/backend/dto/JobDto.java, src/main/java/com/bgroceries/backend/service/JobService.java, src/main/java/com/bgroceries/backend/controller/JobController.java, src/main/java/com/bgroceries/backend/controller/PublicJobController.java"
+      },
+      {
+        "name": "backend-applications",
+        "task": "JobApplication entity (@ManyToOne fetch=LAZY Job, status default NEW) + JobApplicationRepository (@EntityGraph job, ordered by createdAt desc) + JobApplicationDto (request jobId, response adds id/jobTitle/status/createdAt) + JobApplicationService (apply->NEW, list w/ jobTitle, validated updateStatus, delete, resumeData size guard) + AdminApplicationController /api/admin/applications + PublicApplyController POST /api/public/jobs/{id}/apply. Depends on backend-jobs Job/JobRepository — author those files first, then this slice.",
+        "area": "src/main/java/com/bgroceries/backend/entity/JobApplication.java, src/main/java/com/bgroceries/backend/repository/JobApplicationRepository.java, src/main/java/com/bgroceries/backend/dto/JobApplicationDto.java, src/main/java/com/bgroceries/backend/service/JobApplicationService.java, src/main/java/com/bgroceries/backend/controller/AdminApplicationController.java, src/main/java/com/bgroceries/backend/controller/PublicApplyController.java"
+      }
+    ],
+    "frontend": [
+      {
+        "name": "frontend-api",
+        "task": "Rework src/api/api.js: jobAPI -> /admin/jobs CRUD (token auto-attached by request helper), applicationAPI -> /admin/applications (getAll/getById/updateStatus PATCH/DELETE) + applyJob(jobId, payload), publicAPI.getJobs/getJobById under /public/jobs. Leave authAPI/memberAPI/productAPI untouched.",
+        "area": "src/api/api.js"
+      },
+      {
+        "name": "frontend-admin-jobs",
+        "task": "Wire Addjobs.jsx to jobAPI: load list on mount, create/update/delete via API (reload after writes), surface backend error messages, add the missing Benefits textarea + form state field, keep the existing single-page form+live-list UI, bilingual TEXTS, postedDate rendered from createdAt.",
+        "area": "src/Pages/Auth/Addjobs.jsx"
+      },
+      {
+        "name": "frontend-admin-applications",
+        "task": "New Applications.jsx admin page (list: jobTitle + applicant + status badge + createdAt; detail panel: all fields, resume data-URI link built from resumeData+resumeContentType, status dropdown PATCH, delete with confirm) + AdminD.jsx: import it, add ADMIN-only sidebar item 'Applications' (Management section, clipboard icon, link /admin/applications), renderContent case, and '/admin/applications' in the adminOnly list.",
+        "area": "src/Pages/Auth/Applications.jsx, src/Pages/Auth/AdminD.jsx"
+      },
+      {
+        "name": "frontend-career",
+        "task": "Career.jsx fetches publicAPI.getJobs() (replace hardcoded JOBS), derives department filter options from data, links -> /career-detail/:id and /apply-now?job=:id; Careerdetail.jsx reads useParams().id with location.state fallback, fetches by id, renders Job Overview (description line 1), Key Responsibilities (description lines 2+), Requirements (lines), Benefits & Perks (lines) as <li>; App.jsx adds <Route path='/career-detail/:id'>.",
+        "area": "src/Pages/Home/Career.jsx, src/Pages/Home/Careerdetail.jsx, src/App.jsx"
+      },
+      {
+        "name": "frontend-apply",
+        "task": "Applynow.jsx: read ?job= query param, populate the Position dropdown from publicAPI.getJobs() (option value = job.id, label = title), on submit POST applicationAPI.applyJob with jobId + fields + resume read via FileReader to base64 (resumeName + resumeContentType), cap file at ~2MB, show the existing success screen, keep the Telegram button.",
+        "area": "src/Pages/Home/Applynow.jsx"
+      }
+    ],
+    "security": [
+      {
+        "name": "security-audit",
+        "task": "Audit only (no code edits): confirm /api/admin/jobs and /api/admin/applications stay ADMIN-gated via the existing SecurityConfig matcher, /api/public/** (incl. the apply POST) is permitAll with CSRF off, public Job responses leak no personal data, status PATCH input is validated, and no new imports from org.springframework.security.web.filter.*/.cors.*. Report findings.",
+        "area": "(audit, no edits): src/main/java/com/bgroceries/backend/config/SecurityConfig.java, controllers under src/main/java/com/bgroceries/backend/controller/"
+      }
+    ]
+  }
+}

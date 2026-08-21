@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/telegram/webhook").permitAll()  // Telegram bot webhook
                         .requestMatchers("/api/oauth2/**").permitAll()  // OAuth2 test endpoints
+                        .requestMatchers("/api/public/**").permitAll()  // public team directory (safe fields only)
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()  // OAuth2 endpoints
                         .requestMatchers("/login/oauth2/code/**").permitAll()  // OAuth2 callback

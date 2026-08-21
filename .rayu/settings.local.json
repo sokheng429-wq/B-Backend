@@ -79,7 +79,8 @@
       "Edit",
       "Bash",
       "WebSearch",
-      "WebFetch(domain:core.telegram.org)"
+      "WebFetch(domain:core.telegram.org)",
+      "mcp__ide__executeCode"
     ]
   }
 }
