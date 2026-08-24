@@ -6,6 +6,7 @@ import com.bgroceries.backend.entity.User;
 import com.bgroceries.backend.exception.BadRequestException;
 import com.bgroceries.backend.repository.UserRepository;
 import com.bgroceries.backend.security.JwtUtil;
+import com.bgroceries.backend.security.TokenActivityStore;
 import com.bgroceries.backend.social.SocialProfile;
 import com.bgroceries.backend.social.SocialVerifier;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,12 +40,17 @@ class AuthServiceSocialTest {
         ReflectionTestUtils.setField(jwtUtil, "resetTokenExpirationMs", 600_000L);
 
         verifier = new FakeVerifier();
+
+        TokenActivityStore tokenActivityStore = new TokenActivityStore();
+        ReflectionTestUtils.setField(tokenActivityStore, "inactivityTimeoutMs", 300_000L);
+
         authService = new AuthService(
                 userRepository,
                 new BCryptPasswordEncoder(),
                 jwtUtil,
                 null, // OTP flows are not exercised here
-                List.of(verifier));
+                List.of(verifier),
+                tokenActivityStore);
     }
 
     @Test

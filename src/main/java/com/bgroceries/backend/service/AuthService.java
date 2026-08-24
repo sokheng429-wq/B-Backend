@@ -18,6 +18,7 @@ import com.bgroceries.backend.exception.NotFoundException;
 import com.bgroceries.backend.exception.UnauthorizedException;
 import com.bgroceries.backend.repository.UserRepository;
 import com.bgroceries.backend.security.JwtUtil;
+import com.bgroceries.backend.security.TokenActivityStore;
 import com.bgroceries.backend.social.SocialProfile;
 import com.bgroceries.backend.social.SocialVerifier;
 import com.bgroceries.backend.util.PhoneUtil;
@@ -41,6 +42,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final OtpService otpService;
     private final List<SocialVerifier> socialVerifiers;
+    private final TokenActivityStore tokenActivityStore;
 
     @Value("${app.jwt.reset-token-expiration-ms}")
     private long resetTokenExpirationMs;
@@ -92,6 +94,21 @@ public class AuthService {
                 .orElseThrow(() -> new UnauthorizedException("Invalid username/email or password"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+            // If this account was created via social login (Google / Facebook / Telegram)
+            // and does not have a user-defined password yet, establish the password now
+            // so the user can log in with their username and password seamlessly.
+            boolean isSocialAccount = user.getGoogleId() != null
+                    || user.getFacebookId() != null
+                    || user.getTelegramId() != null
+                    || (user.getLoginProvider() != null && !user.getLoginProvider().isBlank());
+
+            if (isSocialAccount && request.getPassword() != null && !request.getPassword().isBlank()) {
+                user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+                user.setLoginProvider(null);
+                userRepository.save(user);
+                return buildAuthResponse(user);
+            }
+
             throw new UnauthorizedException("Invalid username/email or password");
         }
 
@@ -379,11 +396,29 @@ public class AuthService {
 
     // ---------- Helpers ----------
 
+    // ---------- Logout ----------
+
+    /**
+     * Explicit logout: evicts the token from the activity store so that any
+     * subsequent request carrying it will be treated as a session timeout.
+     */
+    public void logout(String bearerToken) {
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            tokenActivityStore.evict(bearerToken.substring(7));
+        }
+    }
+
+    // ---------- Helpers ----------
+
     private AuthResponse buildAuthResponse(User user) {
         // JWT subject: phone if present, otherwise username (social accounts may have no phone).
         String subject = user.getPhoneNumber() != null ? user.getPhoneNumber() : user.getUsername();
         String role = user.getRole() != null ? user.getRole() : "USER";
         String token = jwtUtil.generateAccessToken(subject, user.getId(), role);
+
+        // Register the freshly-issued token in the activity store so that the
+        // inactivity timer starts ticking from the moment of login.
+        tokenActivityStore.register(token);
 
         UserResponse userResponse = UserResponse.builder()
                 .id(user.getId())

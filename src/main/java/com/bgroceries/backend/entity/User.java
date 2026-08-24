@@ -34,7 +34,10 @@ public class User {
     @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 
-    /** Login identifier ("Users Name"). Nullable so existing Neon rows survive the migration. */
+    /**
+     * Login identifier ("Users Name"). Nullable so existing Neon rows survive the
+     * migration.
+     */
     @Column(unique = true, length = 50)
     private String username;
 
@@ -66,15 +69,23 @@ public class User {
     @Column(name = "telegram_user_id", unique = true)
     private Long telegramUserId;
 
-    /** Track which OAuth provider was used for login: "google", "facebook", "telegram", or null for password login */
+    /**
+     * Track which OAuth provider was used for login: "google", "facebook",
+     * "telegram", or null for password login
+     */
     @Column(name = "login_provider", length = 20)
     private String loginProvider;
 
-    /** Nullable: social-media accounts (gmail/telegram/facebook) sign up without a phone. */
+    /**
+     * Nullable: social-media accounts (gmail/telegram/facebook) sign up without a
+     * phone.
+     */
     @Column(name = "phone_number", nullable = true, unique = true, length = 20)
     private String phoneNumber;
 
-    /** Optional profile details (Account Details page). Nullable for existing rows. */
+    /**
+     * Optional profile details (Account Details page). Nullable for existing rows.
+     */
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 

@@ -4,176 +4,79 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-B'Groceries authentication backend built with Spring Boot 3.3 and Java 17. Handles user registration, login (password/OTP/social), and password recovery. Designed to integrate with the B-Frontend React app.
+B'Groceries authentication backend (Spring Boot 3.3.4, Java 17) for the Cambodia-based B'Groceries app. Covers auth (register, identifier login, OTP login/forgot-password), social login three ways, plus Jobs/Job Applications and Members management modules with admin endpoints. Serves the `B-Frontend` React app — request field names (`username`, `fullName`, `email`, `phoneNumber`, `password`, `confirmPassword`, `otp`, `identifier`, `provider`) are part of the API contract; do not rename them.
+
+`RAYU.md` is an older but still largely accurate architecture guide with machine-specific gotchas worth reading. `README.md` is partially stale (says dev profile / port 8080).
 
 ## Development Commands
 
-### Running the application
-
-**Dev mode (H2 in-memory, zero setup):**
 ```bash
-mvn spring-boot:run
-```
-Default profile is `dev`, runs on `http://localhost:8081`. OTP codes are printed to console and included in API responses (`debugOtp` field).
-
-**Production mode (PostgreSQL):**
-```bash
-export DB_URL=jdbc:postgresql://localhost:5432/bgroceries
-export DB_USERNAME=postgres
-export DB_PASSWORD=your_password
-export JWT_SECRET=some-long-random-secret-at-least-32-chars
-mvn spring-boot:run -Dspring-boot.run.profiles=prod
+mvn spring-boot:run                                      # run with default profile (prod = Neon PostgreSQL) on :8081
+mvn spring-boot:run -Dspring-boot.run.profiles=dev       # run with H2 in-memory instead (zero setup)
+mvn test                                                 # all tests (pinned to dev/H2)
+mvn test -Dtest=AuthServiceSocialTest                    # single test class
+mvn clean test                                           # clean first — see gotcha #3
+mvn clean package                                        # build jar
 ```
 
-### Testing
+**Always `mvn clean` before `test`/`spring-boot:run` when `target/` contains IDE-built classes** — IntelliJ's failed compiles leave `.class` files that throw `Unresolved compilation problems` at runtime.
 
-```bash
-# Run all tests
-mvn test
+Profiles:
+- **prod (default)** — Neon PostgreSQL via env vars (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`) with hardcoded fallbacks in `application-prod.yml`; `app.otp.expose-in-response: false`.
+- **dev** — H2 at `jdbc:h2:mem:bgroceries` (`/h2-console`, user `sa`, empty password), `show-sql`, OTP codes echoed back as `debugOtp`.
 
-# Run a specific test class
-mvn test -Dtest=AuthServiceTest
+With no SMS gateway wired up, OTP codes are printed to console: `=== [SMS SIMULATION] OTP ... ===` (read them here under prod).
 
-# Run a specific test method
-mvn test -Dtest=AuthServiceTest#testRegister
+## Environment gotchas (this machine)
 
-# Skip tests during build
-mvn clean install -DskipTests
-```
-
-### Building
-
-```bash
-# Clean and package
-mvn clean package
-
-# Compile only
-mvn compile
-```
+1. **JDK 26 host / Java 17 target**: `pom.xml` pins `<lombok.version>1.18.40</lombok.version>` and `<maven.compiler.proc>full</maven.compiler.proc>` because javac 23+ disables annotation processing by default. If you bump Spring Boot, re-check its managed Lombok version supports the installed JDK.
+2. **Corrupted local `spring-security-web` jar**: the `org.springframework.security.web.filter` and `.cors` packages are unusable. **Do not import from them.** `JwtAuthFilter` implements `jakarta.servlet.Filter` directly (not `OncePerRequestFilter`). The `.authentication` package IS intact — that's why server-side OAuth2 works.
+3. **No Mockito**: class mocking is broken on this JDK. Tests use real collaborators + hand-rolled fakes (see `AuthServiceSocialTest.FakeVerifier`) and reflection to set fields.
 
 ## Architecture
 
-### Authentication Flow
+Layered Spring Boot app under `com.bgroceries.backend`: `controller/` → `service/` → `repository/` (JPA) → `entity/`. All responses use the `ApiResponse<T>` envelope `{success, message, data}`. Errors: throw `ApiException` subclasses (`BadRequestException` 400, `UnauthorizedException` 401, `NotFoundException` 404, `ConflictException` 409); `GlobalExceptionHandler` maps them plus Bean Validation errors (returned in `data` as `{field: message}`).
 
-The system supports multiple authentication methods that converge into a single JWT-based session:
+### Endpoints
 
-1. **Register + Password Login**: Phone-based registration with BCrypt-hashed passwords
-2. **OTP Login**: Passwordless login via SMS OTP to registered phone numbers
-3. **Social Login**: OAuth integration with Google, Facebook, and Telegram
-4. **Password Recovery**: OTP-based password reset flow with short-lived reset tokens
+- `/api/auth/**` (public): `register`, `login`, `social`, `telegram/init`, `telegram/status/{token}`, `login/otp/send|verify`, `forgot-password/send-otp|verify-otp|reset`
+- `/api/users/me` (authenticated): GET/PUT profile; PUT returns a fresh `AuthResponse` because changing the phone changes the JWT subject
+- `/api/public/jobs`, `/api/public/jobs/{id}/apply`, `/api/public/members` (public, safe fields only)
+- `/api/admin/jobs|applications|users` (require `ROLE_ADMIN` via the `/api/admin/**` path matcher — no `@PreAuthorize` needed on those controllers)
+- `/api/members` (authenticated CRUD)
+- Dev-only: `/api/oauth2/**` test/diagnostic endpoints and `static/oauth-test.html` ("REMOVE IN PRODUCTION")
+- `/api/telegram/webhook` (public) — Telegram bot updates
 
-All authentication methods return a JWT access token (24h expiry by default) in `AuthResponse`.
+### Authentication flows
 
-### User Identity Model
+All methods converge into a JWT session (`JwtUtil`, jjwt 0.12). ACCESS tokens carry `type=ACCESS`, `userId`, `role`, and **subject = phone if present, else username** — any code resolving "the current user" must try phone first, then username (see `CustomUserDetailsService`, `UserController`, `TelegramService`). RESET tokens have `type=RESET` and 10-min expiry.
 
-Users have multiple optional identity fields allowing flexible login methods:
-- `phoneNumber` — normalized to `+855XXXXXXXXX` format (Cambodia), used for OTP flows
-- `username` — unique login identifier, generated from social profiles if not provided
-- `email` — used for Google/Facebook account linking
-- `telegram` / `facebook` — social media handles
-- `googleId` / `facebookId` / `telegramId` — stable provider IDs from verified OAuth tokens
+1. **Register/password/OTP login** (`AuthService`): phone normalized to `+855XXXXXXXXX` via `PhoneUtil` (always normalize before DB lookups). Login identifier resolves across username → full name → email → telegram → facebook → phone. Logging into a passwordless social account with a password sets that password.
+2. **OTP**: `OtpService` stores only BCrypt hashes (`otp_codes`, keyed by phone + purpose LOGIN/RESET_PASSWORD); expiry 2 min, max 2 attempts (configurable). Forgot-password is three steps: send OTP → verify (returns short-lived `resetToken` JWT) → reset with token.
+3. **Inactivity auto-logout**: `TokenActivityStore` (in-memory) tracks last-seen per token; `JwtAuthFilter` rejects tokens idle > 5 min with HTTP 401 `{"error":"SESSION_TIMEOUT"}` and evicts them. Tokens issued before this feature exist are also rejected (never registered).
 
-Phone numbers are normalized via `PhoneUtil.normalize()` to handle user input variations (`012345678` → `+85512345678`). Social accounts are linked by provider ID, with email-based fallback for Google/Facebook.
+### Social login — three parallel implementations (all coexist)
 
-### OTP Security
+- **Token-verified `POST /api/auth/social`**: when the request carries a `token`, the matching `SocialVerifier` (`social/` package) cryptographically verifies it server-side — `GoogleSocialVerifier` (ID token vs Google JWKS, checks `aud` + `email_verified`, 1h JWKS cache), `FacebookSocialVerifier` (Graph `debug_token`), `TelegramSocialVerifier` (Login Widget HMAC-SHA256, key = `SHA256(bot_token)`). Find-or-create by provider ID or provider-verified email. Without a `token`, falls back to simulated demo accounts (`gmail.demo@bgroceries.demo` etc.). Verifiers fail safe with opaque 401 when credentials are placeholders. `AuthService` injects them as `List<SocialVerifier>`.
+- **Server-side OAuth2** (`security/oauth/`): Spring Security `oauth2Login` for Google/Facebook. `/oauth2/authorization/{provider}` → callback → `CustomOAuth2UserService` find-or-creates the user → `OAuth2LoginSuccessHandler` mints a JWT and 302s to `app.oauth2.redirect-uri` (default `http://localhost:5173/oauth2/redirect`) as `?token=<jwt>`. Client registrations live under `spring.security.oauth2.client.*`. Sessions are `IF_REQUIRED` (not stateless) because the OAuth2 dance needs them; plain JWT API calls still use no session.
+- **Telegram bot flow** (`service/TelegramService` + `LoginSession` entity): frontend calls `/api/auth/telegram/init` → opens `t.me/BGroceriesBot?start=<token>` → webhook delivers `/start <token>` → session marked COMPLETED with stored JWT → frontend polls `status/{token}`. Requires webhook registration (`setup-telegram-webhook.sh/.bat`, expects a localtunnel URL).
 
-OTP codes are never stored in plaintext. The `OtpService`:
-1. Generates a 6-digit code using `SecureRandom`
-2. Stores only the BCrypt hash in the `otp_codes` table
-3. Tracks attempts (max 5) and expiration (5 min)
-4. Marks codes as `used=true` after successful verification to prevent reuse
+Social-created users get a random BCrypt password, no phone, unique generated username; their JWT subject is the username.
 
-OTP purposes (`LOGIN`, `RESET_PASSWORD`) are scoped separately in the database.
+### Data model highlights
 
-### Social Login Verification
+`User` carries multiple optional identity fields: `phoneNumber` (unique, nullable — social accounts have none), `username`, `fullName`, `email`, `telegram`, `facebook`, provider IDs `googleId`/`facebookId`/`telegramId` (+ numeric `telegramUserId` for the bot flow), `loginProvider`, role (`USER`/`ADMIN`), optional profile fields. `DataInitializer` seeds `admin`/`admin123`. Other entities: `OtpCode`, `PasswordResetOtp`, `LoginSession`, `Member`(+`MemberDetail`), `Job`, `JobApplication`.
 
-When a `token` is provided in `SocialLoginRequest`, the backend cryptographically verifies it server-side before trusting the identity:
+### Configuration
 
-- **Gmail**: Verifies Google ID token (JWT) signature against Google's JWKS, checks `aud` matches configured client ID, ensures `email_verified=true`
-- **Facebook**: Validates user access token via `https://graph.facebook.com/v21.0/debug_token` endpoint
-- **Telegram**: Verifies Login Widget `auth` object using HMAC-SHA256 with `SHA256(bot_token)` as key
+- `application.yml` — base config: prod profile active, `app.jwt.*` (24h access, 10min reset, 5min inactivity timeout), `app.otp.*`, `app.social.*`, `spring.security.oauth2.client.*`, `telegram.bot.*`, Gmail SMTP for forgot-password email (`GMAIL_SMTP_USERNAME`/`GMAIL_SMTP_PASSWORD` env vars; empty → console log via `SmtpEmailServiceImpl`)
+- `application-dev.yml` / `application-prod.yml` — datasource + OTP exposure per profile
+- Env-overridable throughout following the `${ENV_VAR:default}` pattern; put new settings under `app.*`
+- CORS: `CorsConfig` bean (wide open for Vite dev server :5173)
 
-Verification is implemented in `SocialVerifier` interface with provider-specific implementations (`GoogleSocialVerifier`, `FacebookSocialVerifier`, `TelegramSocialVerifier`). If no `token` is provided, falls back to simulated demo mode (find-or-create by handle/email).
+### Conventions
 
-OAuth credentials are configured via environment variables (`GOOGLE_CLIENT_ID`, `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET`, `TELEGRAM_BOT_TOKEN`) in `application.yml`.
-
-### Security Configuration
-
-`SecurityConfig` (src/main/java/.../config/SecurityConfig.java):
-- All `/api/auth/**` endpoints are public
-- All other endpoints require JWT authentication via `JwtAuthFilter`
-- CORS is configured in `CorsConfig` with environment-based origins
-- Sessions are stateless (no server-side session storage)
-- Admin endpoints protected with `@PreAuthorize("hasRole('ADMIN')")` or path matcher `/api/admin/**`
-
-JWT tokens carry `userId`, `role`, and `subject` (phone or username) claims. Reset tokens have `type: "RESET"` claim and shorter expiry (10 min).
-
-### Package Structure
-
-- `controller/` — REST endpoints, all return `ApiResponse<T>` wrapper
-- `service/` — Business logic, transactional boundaries
-- `repository/` — JPA repositories extending `JpaRepository`
-- `entity/` — JPA entities with Lombok builders
-- `dto/request/` — Input DTOs with `@Valid` Jakarta validation
-- `dto/response/` — Output DTOs
-- `security/` — JWT utilities, authentication filter, UserDetailsService
-- `social/` — Social login verification (`SocialVerifier` implementations)
-- `config/` — Spring configuration (security, CORS, data initialization)
-- `exception/` — Custom exceptions with `GlobalExceptionHandler` for REST error responses
-- `util/` — Utilities (phone normalization)
-
-### Database Profiles
-
-**dev** (default): H2 in-memory database at `jdbc:h2:mem:bgroceries`, accessible via `/h2-console`. Schema auto-created. Sample data loaded via `DataInitializer`.
-
-**prod**: PostgreSQL via environment variables. JPA DDL mode is `update` to preserve existing data. Ensure database and credentials are configured before starting.
-
-## Common Patterns
-
-### Adding New Authenticated Endpoints
-
-1. Create a new controller in `controller/` package
-2. Add `@RestController`, `@RequestMapping`, and `@RequiredArgsConstructor`
-3. Authenticated endpoints require `Authorization: Bearer <token>` header
-4. Extract user from JWT via `@AuthenticationPrincipal` or parse token in service layer
-5. Wrap responses in `ApiResponse.success()` or `ApiResponse.error()`
-
-### Error Handling
-
-Custom exceptions (`BadRequestException`, `NotFoundException`, `UnauthorizedException`, `ConflictException`) are caught by `GlobalExceptionHandler` and automatically converted to `ApiResponse` with appropriate HTTP status codes. Throw these exceptions directly from service methods.
-
-### SMS Integration
-
-`SmsService` interface has a console-only implementation (`ConsoleSmsServiceImpl`) that prints OTP codes to stdout. Replace with a real SMS gateway (Twilio, PlasGate) by implementing `SmsService` and marking it as `@Primary` or removing the console implementation.
-
-## Configuration
-
-Application settings are in `src/main/resources/application.yml`:
-- JWT secrets and expiration times
-- OTP length, expiry, max attempts, debug exposure
-- Social OAuth credentials
-- Database connection per profile
-- Server port (default 8081)
-
-Override with environment variables (e.g., `JWT_SECRET`, `DB_URL`) or Spring Boot properties (`-Dapp.otp.expiry-minutes=10`).
-
-## Testing Flows
-
-In dev mode, OTP codes are exposed in responses (`debugOtp` field) and console logs for testing without SMS gateway:
-
-```
-=== [SMS SIMULATION] OTP 483920 sent to +85512345678 ===
-```
-
-For social login testing without real OAuth:
-- Omit the `token` field in `SocialLoginRequest` to use simulated demo mode
-- Provide `identifier` (email/handle) or leave empty for stable demo accounts
-- Real OAuth testing requires valid credentials in environment variables
-
-## Notes
-
-- Phone number changes are not currently supported; phone is immutable after registration
-- User roles default to `USER`; promote to `ADMIN` via direct database update
-- JWT tokens are not invalidated server-side (logout is client-side token deletion)
-- OTP codes can be reused across attempts until verification or expiry/max attempts
-- Social account linking happens on first login; subsequent logins match by provider ID
+- Lombok pervasively (`@RequiredArgsConstructor`, `@Builder`, `@Slf4j`) — see gotcha #1
+- DTOs split `dto/request` (Bean Validation annotations) and `dto/response`
+- SMS behind `SmsService` interface (only impl: console logger; exactly one bean may exist). Email behind `EmailService` (SMTP impl with console fallback).
+- Profile-sensitive behavior driven by `application-*.yml`, not code branches

@@ -53,6 +53,7 @@ app:
     secret: ${JWT_SECRET:bgroceries-super-secret-key-change-this-in-production-min-32-chars}
     access-token-expiration-ms: ${JWT_ACCESS_EXPIRATION_MS:86400000}   # 24 hours
     reset-token-expiration-ms: ${JWT_RESET_EXPIRATION_MS:600000}       # 10 minutes
+    inactivity-timeout-ms: ${JWT_INACTIVITY_TIMEOUT_MS:300000}        # 5 minutes — auto-logout on idle
   otp:
     length: 6
     expiry-minutes: 2

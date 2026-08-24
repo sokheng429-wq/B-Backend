@@ -1,6 +1,7 @@
 package com.bgroceries.backend.security.oauth;
 
 import com.bgroceries.backend.security.JwtUtil;
+import com.bgroceries.backend.security.TokenActivityStore;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,6 +28,7 @@ import java.io.IOException;
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtUtil jwtUtil;
+    private final TokenActivityStore tokenActivityStore;
 
     @Value("${app.oauth2.redirect-uri}")
     private String redirectUri;
@@ -53,6 +55,9 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             );
 
             log.info("✅ JWT token generated successfully (length: {})", token.length());
+
+            // Register in the activity store so the inactivity timer starts for OAuth2 logins too.
+            tokenActivityStore.register(token);
 
             String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
                     .queryParam("token", token)
