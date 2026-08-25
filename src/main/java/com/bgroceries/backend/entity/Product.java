@@ -130,8 +130,9 @@ public class Product {
     @Column(name = "favorite", nullable = false)
     private Boolean favorite = false;
 
-    /** Optional product photo URL shown across the shop. */
-    @Column(name = "image_url", length = 500)
+    /** Product photo — a URL, or a compressed base64 data URL picked on the
+     * Add-Product page (data URLs run tens of thousands of chars). */
+    @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl;
 
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -90,6 +90,7 @@ public class ProductDto {
 
     private Boolean favorite;
 
+    /** URL or compressed base64 data URL (see Product.imageUrl). */
     private String imageUrl;
 
     /** Read-only audit stamps — populated from the entity. */
