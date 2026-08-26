@@ -26,6 +26,7 @@ com\bgroceries\backend\controller\UserController.class
 com\bgroceries\backend\dto\JobDto.class
 com\bgroceries\backend\entity\MemberDetail$MemberDetailBuilder.class
 com\bgroceries\backend\security\TokenActivityStore.class
+com\bgroceries\backend\service\StockDocumentService$1.class
 com\bgroceries\backend\dto\MemberDto$MemberDetailDto$MemberDetailDtoBuilder.class
 com\bgroceries\backend\entity\PasswordResetOtp.class
 com\bgroceries\backend\controller\MemberController.class

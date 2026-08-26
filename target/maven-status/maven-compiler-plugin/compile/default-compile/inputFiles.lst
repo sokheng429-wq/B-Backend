@@ -19,6 +19,7 @@ D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controll
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\PublicApplyController.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\PublicJobController.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\PublicMemberController.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\StockDocumentController.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\SupplierController.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\SupplierGroupController.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\TelegramAuthController.java
@@ -48,6 +49,7 @@ D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\resp
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\response\OtpSentResponse.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\response\ResetTokenResponse.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\response\UserResponse.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\StockDocumentDto.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\SupplierDto.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\SupplierGroupDto.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\UnitOfMeasureDto.java
@@ -63,6 +65,8 @@ D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\O
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\PasswordResetOtp.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\Product.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\ProductGroup.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\StockDocument.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\StockLine.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\Supplier.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\SupplierGroup.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\UnitOfMeasure.java
@@ -86,6 +90,8 @@ D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\reposito
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\PasswordResetOtpRepository.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\ProductGroupRepository.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\ProductRepository.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\StockDocumentRepository.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\StockLineRepository.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\SupplierGroupRepository.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\SupplierRepository.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\UnitOfMeasureRepository.java
@@ -112,6 +118,7 @@ D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\ProductGroupService.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\ProductService.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\SmsService.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\StockDocumentService.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\SupplierGroupService.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\SupplierService.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\TelegramService.java

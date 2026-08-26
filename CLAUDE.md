@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-B'Groceries authentication backend (Spring Boot 3.3.4, Java 17) for the Cambodia-based B'Groceries app. Covers auth (register, identifier login, OTP login/forgot-password), social login three ways, plus Jobs/Job Applications and Members management modules with admin endpoints. Serves the `B-Frontend` React app — request field names (`username`, `fullName`, `email`, `phoneNumber`, `password`, `confirmPassword`, `otp`, `identifier`, `provider`) are part of the API contract; do not rename them.
+B'Groceries authentication backend (Spring Boot 3.3.4, Java 17) for the Cambodia-based B'Groceries app. Covers auth (register, identifier login, OTP login/forgot-password), social login three ways, plus Jobs/Job Applications, Members management, and the Stocks/catalog modules (Products + master data) with admin endpoints. Serves the `B-Frontend` React app — request field names (`username`, `fullName`, `email`, `phoneNumber`, `password`, `confirmPassword`, `otp`, `identifier`, `provider`) are part of the API contract; do not rename them.
 
 `RAYU.md` is an older but still largely accurate architecture guide with machine-specific gotchas worth reading. `README.md` is partially stale (says dev profile / port 8080).
 
@@ -42,7 +42,7 @@ Layered Spring Boot app under `com.bgroceries.backend`: `controller/` → `servi
 - `/api/auth/**` (public): `register`, `login`, `social`, `telegram/init`, `telegram/status/{token}`, `login/otp/send|verify`, `forgot-password/send-otp|verify-otp|reset`
 - `/api/users/me` (authenticated): GET/PUT profile; PUT returns a fresh `AuthResponse` because changing the phone changes the JWT subject
 - `/api/public/jobs`, `/api/public/jobs/{id}/apply`, `/api/public/members` (public, safe fields only)
-- `/api/admin/jobs|applications|users` (require `ROLE_ADMIN` via the `/api/admin/**` path matcher — no `@PreAuthorize` needed on those controllers)
+- `/api/admin/**` (require `ROLE_ADMIN` via the `/api/admin/**` path matcher — no `@PreAuthorize` needed on those controllers): `jobs`, `applications`, `users`, plus the Stocks/catalog CRUD: `products`, `product-groups`, `categories`, `brands`, `suppliers`, `supplier-groups`, `unit-of-measures`, `attributes`
 - `/api/members` (authenticated CRUD)
 - Dev-only: `/api/oauth2/**` test/diagnostic endpoints and `static/oauth-test.html` ("REMOVE IN PRODUCTION")
 - `/api/telegram/webhook` (public) — Telegram bot updates
@@ -66,6 +66,16 @@ Social-created users get a random BCrypt password, no phone, unique generated us
 ### Data model highlights
 
 `User` carries multiple optional identity fields: `phoneNumber` (unique, nullable — social accounts have none), `username`, `fullName`, `email`, `telegram`, `facebook`, provider IDs `googleId`/`facebookId`/`telegramId` (+ numeric `telegramUserId` for the bot flow), `loginProvider`, role (`USER`/`ADMIN`), optional profile fields. `DataInitializer` seeds `admin`/`admin123`. Other entities: `OtpCode`, `PasswordResetOtp`, `LoginSession`, `Member`(+`MemberDetail`), `Job`, `JobApplication`.
+
+### Stocks / catalog modules
+
+`Product` plus seven master-data entities (`ProductGroup`, `Category`, `Brand`, `Supplier`, `SupplierGroup`, `UnitOfMeasure`, `Attribute`) — all admin CRUD via generic controller/service/repository triplets under `/api/admin/*`. Conventions shared across them:
+
+- Unique `code` when provided (blank/absent strings are normalized to null; duplicates → 409). `description` is required, `nameKh` holds the Khmer display name, and there's an `active` flag.
+- **Master-data references on Product are plain strings, not FKs** (`productGroup`, `category`, `brand`, `supplier`, `uom`) — deliberate, so the dedicated management pages can be upgraded to foreign keys later without changing the API shape.
+- Quantity fields (`onHand`, `onPo`, `onSo`, `availableStock`) are decimals so weighed goods work; `imageUrl` is TEXT because it may hold a compressed base64 data URL from the Add-Product page.
+
+Schema is `ddl-auto: update` in both profiles — entity changes auto-migrate; no Flyway/Liquibase (`db/member_tables.sql` is a manual reference script only).
 
 ### Configuration
 
