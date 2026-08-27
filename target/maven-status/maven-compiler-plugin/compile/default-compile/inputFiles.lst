@@ -24,6 +24,7 @@ D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controll
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\SupplierGroupController.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\TelegramAuthController.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\TelegramWebhookController.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\TransferDocumentController.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\UnitOfMeasureController.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\UserController.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\AdminUserDto.java
@@ -52,6 +53,7 @@ D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\resp
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\StockDocumentDto.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\SupplierDto.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\SupplierGroupDto.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\TransferDocumentDto.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\UnitOfMeasureDto.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\Attribute.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\Brand.java
@@ -69,6 +71,8 @@ D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\S
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\StockLine.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\Supplier.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\SupplierGroup.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\TransferDocument.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\TransferLine.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\UnitOfMeasure.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\User.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\enums\OtpPurpose.java
@@ -94,6 +98,7 @@ D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\reposito
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\StockLineRepository.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\SupplierGroupRepository.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\SupplierRepository.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\TransferDocumentRepository.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\UnitOfMeasureRepository.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\UserRepository.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\security\CustomUserDetailsService.java
@@ -122,6 +127,7 @@ D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\SupplierGroupService.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\SupplierService.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\TelegramService.java
+D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\TransferDocumentService.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\UnitOfMeasureService.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\service\UserService.java
 D:\1.B.Groceries\Backend\B-backend\src\main\java\com\bgroceries\backend\social\FacebookSocialVerifier.java
