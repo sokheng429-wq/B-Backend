@@ -1,8 +1,8 @@
 package com.bgroceries.backend.service;
 
 import com.bgroceries.backend.dto.JobApplicationDto;
-import com.bgroceries.backend.entity.Job;
-import com.bgroceries.backend.entity.JobApplication;
+import com.bgroceries.backend.entity.Information.Job;
+import com.bgroceries.backend.entity.Information.JobApplication;
 import com.bgroceries.backend.exception.BadRequestException;
 import com.bgroceries.backend.exception.NotFoundException;
 import com.bgroceries.backend.repository.JobApplicationRepository;

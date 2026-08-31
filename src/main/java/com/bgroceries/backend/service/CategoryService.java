@@ -1,7 +1,7 @@
 package com.bgroceries.backend.service;
 
 import com.bgroceries.backend.dto.CategoryDto;
-import com.bgroceries.backend.entity.Category;
+import com.bgroceries.backend.entity.Stocks.Category;
 import com.bgroceries.backend.exception.ConflictException;
 import com.bgroceries.backend.exception.NotFoundException;
 import com.bgroceries.backend.repository.CategoryRepository;

@@ -1,8 +1,8 @@
 package com.bgroceries.backend.service;
 
 import com.bgroceries.backend.dto.ProductScaleDto;
-import com.bgroceries.backend.entity.Product;
-import com.bgroceries.backend.entity.ProductScale;
+import com.bgroceries.backend.entity.Stocks.Product;
+import com.bgroceries.backend.entity.Stocks.ProductScale;
 import com.bgroceries.backend.exception.NotFoundException;
 import com.bgroceries.backend.repository.ProductRepository;
 import com.bgroceries.backend.repository.ProductScaleRepository;

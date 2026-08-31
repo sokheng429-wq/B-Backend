@@ -1,6 +1,6 @@
 package com.bgroceries.backend.dto;
 
-import com.bgroceries.backend.entity.SerialNumber;
+import com.bgroceries.backend.entity.Stocks.SerialNumber;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

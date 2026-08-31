@@ -1,7 +1,7 @@
 package com.bgroceries.backend.service;
 
 import com.bgroceries.backend.dto.UnitOfMeasureDto;
-import com.bgroceries.backend.entity.UnitOfMeasure;
+import com.bgroceries.backend.entity.Stocks.UnitOfMeasure;
 import com.bgroceries.backend.exception.ConflictException;
 import com.bgroceries.backend.exception.NotFoundException;
 import com.bgroceries.backend.repository.UnitOfMeasureRepository;

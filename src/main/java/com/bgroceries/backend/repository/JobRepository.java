@@ -1,6 +1,6 @@
 package com.bgroceries.backend.repository;
 
-import com.bgroceries.backend.entity.Job;
+import com.bgroceries.backend.entity.Information.Job;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

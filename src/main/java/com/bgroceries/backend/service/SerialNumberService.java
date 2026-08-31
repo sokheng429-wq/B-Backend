@@ -1,9 +1,9 @@
 package com.bgroceries.backend.service;
 
 import com.bgroceries.backend.dto.SerialNumberDto;
-import com.bgroceries.backend.entity.Product;
-import com.bgroceries.backend.entity.SerialNumber;
-import com.bgroceries.backend.entity.StockLine;
+import com.bgroceries.backend.entity.Stocks.Product;
+import com.bgroceries.backend.entity.Stocks.SerialNumber;
+import com.bgroceries.backend.entity.Stocks.StockLine;
 import com.bgroceries.backend.exception.NotFoundException;
 import com.bgroceries.backend.repository.ProductRepository;
 import com.bgroceries.backend.repository.SerialNumberRepository;

@@ -1,6 +1,6 @@
 package com.bgroceries.backend.dto;
 
-import com.bgroceries.backend.entity.StockDocument;
+import com.bgroceries.backend.entity.Stocks.StockDocument;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

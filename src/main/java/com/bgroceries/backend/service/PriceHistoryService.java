@@ -1,8 +1,8 @@
 package com.bgroceries.backend.service;
 
 import com.bgroceries.backend.dto.PriceHistoryDto;
-import com.bgroceries.backend.entity.PriceHistory;
-import com.bgroceries.backend.entity.Product;
+import com.bgroceries.backend.entity.Stocks.PriceHistory;
+import com.bgroceries.backend.entity.Stocks.Product;
 import com.bgroceries.backend.exception.NotFoundException;
 import com.bgroceries.backend.repository.PriceHistoryRepository;
 import com.bgroceries.backend.repository.ProductRepository;

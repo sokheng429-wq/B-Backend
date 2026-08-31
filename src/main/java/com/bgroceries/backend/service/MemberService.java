@@ -1,8 +1,8 @@
 package com.bgroceries.backend.service;
 
 import com.bgroceries.backend.dto.MemberDto;
-import com.bgroceries.backend.entity.Member;
-import com.bgroceries.backend.entity.MemberDetail;
+import com.bgroceries.backend.entity.Information.Member;
+import com.bgroceries.backend.entity.Information.MemberDetail;
 import com.bgroceries.backend.exception.ConflictException;
 import com.bgroceries.backend.exception.NotFoundException;
 import com.bgroceries.backend.repository.MemberRepository;
@@ -43,6 +43,26 @@ public class MemberService {
             members = memberRepository.findAll();
         }
         return members.stream().map(this::toDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<com.bgroceries.backend.dto.PublicMemberDto> getPublicMembers() {
+        return memberRepository.findAll().stream()
+                .map(this::toPublicDto)
+                .toList();
+    }
+
+    private com.bgroceries.backend.dto.PublicMemberDto toPublicDto(Member member) {
+        return new com.bgroceries.backend.dto.PublicMemberDto(
+                member.getId(),
+                member.getFullName(),
+                member.getPosition(),
+                member.getRank(),
+                member.getDepartment(),
+                member.getCategory(),
+                member.getPhotoUrl(),
+                member.getMemberDetail() != null ? member.getMemberDetail().getNote() : null
+        );
     }
 
     @Transactional(readOnly = true)

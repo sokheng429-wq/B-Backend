@@ -1,8 +1,8 @@
 package com.bgroceries.backend.service;
 
 import com.bgroceries.backend.dto.AttributeChangeLogDto;
-import com.bgroceries.backend.entity.AttributeChangeLog;
-import com.bgroceries.backend.entity.Product;
+import com.bgroceries.backend.entity.Stocks.AttributeChangeLog;
+import com.bgroceries.backend.entity.Stocks.Product;
 import com.bgroceries.backend.exception.NotFoundException;
 import com.bgroceries.backend.repository.AttributeChangeLogRepository;
 import com.bgroceries.backend.repository.ProductRepository;

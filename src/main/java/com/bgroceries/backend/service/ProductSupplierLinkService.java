@@ -1,9 +1,9 @@
 package com.bgroceries.backend.service;
 
 import com.bgroceries.backend.dto.ProductSupplierLinkDto;
-import com.bgroceries.backend.entity.Product;
-import com.bgroceries.backend.entity.ProductSupplierLink;
-import com.bgroceries.backend.entity.Supplier;
+import com.bgroceries.backend.entity.Stocks.Product;
+import com.bgroceries.backend.entity.Stocks.ProductSupplierLink;
+import com.bgroceries.backend.entity.Stocks.Supplier;
 import com.bgroceries.backend.exception.NotFoundException;
 import com.bgroceries.backend.repository.ProductRepository;
 import com.bgroceries.backend.repository.ProductSupplierLinkRepository;

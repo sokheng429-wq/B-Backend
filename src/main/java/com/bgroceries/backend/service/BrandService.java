@@ -1,7 +1,7 @@
 package com.bgroceries.backend.service;
 
 import com.bgroceries.backend.dto.BrandDto;
-import com.bgroceries.backend.entity.Brand;
+import com.bgroceries.backend.entity.Stocks.Brand;
 import com.bgroceries.backend.exception.ConflictException;
 import com.bgroceries.backend.exception.NotFoundException;
 import com.bgroceries.backend.repository.BrandRepository;

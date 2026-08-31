@@ -1,6 +1,6 @@
 package com.bgroceries.backend.repository;
 
-import com.bgroceries.backend.entity.StockLine;
+import com.bgroceries.backend.entity.Stocks.StockLine;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

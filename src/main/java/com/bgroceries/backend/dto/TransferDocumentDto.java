@@ -1,6 +1,6 @@
 package com.bgroceries.backend.dto;
 
-import com.bgroceries.backend.entity.TransferDocument;
+import com.bgroceries.backend.entity.Stocks.TransferDocument;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

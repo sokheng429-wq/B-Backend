@@ -1,6 +1,6 @@
 package com.bgroceries.backend.repository;
 
-import com.bgroceries.backend.entity.JobApplication;
+import com.bgroceries.backend.entity.Information.JobApplication;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 

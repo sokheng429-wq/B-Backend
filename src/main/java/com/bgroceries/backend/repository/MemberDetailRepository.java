@@ -1,6 +1,6 @@
 package com.bgroceries.backend.repository;
 
-import com.bgroceries.backend.entity.MemberDetail;
+import com.bgroceries.backend.entity.Information.MemberDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

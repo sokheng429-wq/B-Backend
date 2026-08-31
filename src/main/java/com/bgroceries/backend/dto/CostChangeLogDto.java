@@ -1,6 +1,6 @@
 package com.bgroceries.backend.dto;
 
-import com.bgroceries.backend.entity.CostChangeLog;
+import com.bgroceries.backend.entity.Stocks.CostChangeLog;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

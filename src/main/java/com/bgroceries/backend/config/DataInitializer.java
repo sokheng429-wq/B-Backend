@@ -23,13 +23,13 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (!userRepository.existsByUsername("admin")) {
+        if (!userRepository.existsByUsername("Badmin")) {
             User admin = User.builder()
-                    .username("admin")
-                    .fullName("Admin")
-                    .email("admin@bgroceries.com")
-                    .phoneNumber(PhoneUtil.normalize("010000000"))
-                    .passwordHash(passwordEncoder.encode("admin123"))
+                    .username("Badmin")
+                    .fullName("BAdmin")
+                    .email("Badmin@bgroceries.com")
+                    .phoneNumber(PhoneUtil.normalize("012793921"))
+                    .passwordHash(passwordEncoder.encode("012793921"))
                     .role("ADMIN")
                     .enabled(true)
                     .build();

@@ -1,6 +1,6 @@
 package com.bgroceries.backend.repository;
 
-import com.bgroceries.backend.entity.AttributeChangeLog;
+import com.bgroceries.backend.entity.Stocks.AttributeChangeLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

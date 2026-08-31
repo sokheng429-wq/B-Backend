@@ -1,7 +1,7 @@
 package com.bgroceries.backend.service;
 
 import com.bgroceries.backend.dto.JobDto;
-import com.bgroceries.backend.entity.Job;
+import com.bgroceries.backend.entity.Information.Job;
 import com.bgroceries.backend.exception.ConflictException;
 import com.bgroceries.backend.exception.NotFoundException;
 import com.bgroceries.backend.repository.JobApplicationRepository;

@@ -1,8 +1,8 @@
 package com.bgroceries.backend.service;
 
 import com.bgroceries.backend.dto.CostChangeLogDto;
-import com.bgroceries.backend.entity.CostChangeLog;
-import com.bgroceries.backend.entity.Product;
+import com.bgroceries.backend.entity.Stocks.CostChangeLog;
+import com.bgroceries.backend.entity.Stocks.Product;
 import com.bgroceries.backend.exception.NotFoundException;
 import com.bgroceries.backend.repository.CostChangeLogRepository;
 import com.bgroceries.backend.repository.ProductRepository;

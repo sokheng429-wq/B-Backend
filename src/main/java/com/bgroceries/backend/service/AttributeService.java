@@ -1,7 +1,7 @@
 package com.bgroceries.backend.service;
 
 import com.bgroceries.backend.dto.AttributeDto;
-import com.bgroceries.backend.entity.Attribute;
+import com.bgroceries.backend.entity.Stocks.Attribute;
 import com.bgroceries.backend.exception.ConflictException;
 import com.bgroceries.backend.exception.NotFoundException;
 import com.bgroceries.backend.repository.AttributeRepository;
