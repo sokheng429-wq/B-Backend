@@ -32,6 +32,7 @@ com\bgroceries\backend\config\DataInitializer.class
 com\bgroceries\backend\util\PhoneUtil.class
 com\bgroceries\backend\exception\ApiException.class
 com\bgroceries\backend\controller\ActivityLogController.class
+com\bgroceries\backend\controller\Sale\CustomerGroupController.class
 com\bgroceries\backend\entity\Stocks\ReceiveLine.class
 com\bgroceries\backend\entity\Stocks\Category$CategoryBuilder.class
 com\bgroceries\backend\controller\PasswordResetController$ForgotPasswordRequest.class
@@ -50,6 +51,7 @@ com\bgroceries\backend\security\oauth\CustomOAuth2UserService.class
 com\bgroceries\backend\entity\User.class
 com\bgroceries\backend\dto\JobDto$JobDtoBuilder.class
 com\bgroceries\backend\entity\Stocks\TransferDocument.class
+com\bgroceries\backend\service\CustomerService.class
 com\bgroceries\backend\entity\Stocks\AdjustmentDocument$AdjustmentDocumentBuilder.class
 com\bgroceries\backend\repository\StockDocumentRepository.class
 com\bgroceries\backend\entity\Stocks\ProductGroup.class
@@ -85,6 +87,7 @@ com\bgroceries\backend\social\FacebookSocialVerifier.class
 com\bgroceries\backend\controller\Information\MemberController.class
 com\bgroceries\backend\entity\Information\Job.class
 com\bgroceries\backend\controller\Stocks\BrandController.class
+com\bgroceries\backend\controller\Sale\CustomerController.class
 com\bgroceries\backend\dto\request\UpdateProfileRequest.class
 com\bgroceries\backend\service\SupplierGroupService.class
 com\bgroceries\backend\entity\Stocks\AdjustmentLine.class
@@ -107,6 +110,7 @@ com\bgroceries\backend\controller\Stocks\TransferDocumentController.class
 com\bgroceries\backend\dto\CostChangeLogDto.class
 com\bgroceries\backend\entity\Stocks\ProductScale$ProductScaleBuilder.class
 com\bgroceries\backend\security\oauth\CustomOAuth2User.class
+com\bgroceries\backend\dto\CustomerDto.class
 com\bgroceries\backend\entity\ActivityLog$ActivityLogBuilder.class
 com\bgroceries\backend\repository\UserRepository.class
 com\bgroceries\backend\service\UserService.class
@@ -117,6 +121,7 @@ com\bgroceries\backend\entity\Stocks\PriceHistory$PriceHistoryBuilder.class
 com\bgroceries\backend\entity\Stocks\StockDocument$DocType.class
 com\bgroceries\backend\repository\ProductSupplierLinkRepository.class
 com\bgroceries\backend\dto\AttributeChangeLogDto.class
+com\bgroceries\backend\dto\CustomerGroupDto.class
 com\bgroceries\backend\entity\Information\MemberDetail.class
 com\bgroceries\backend\entity\Stocks\IssueLine.class
 com\bgroceries\backend\config\CorsConfig.class
@@ -141,6 +146,7 @@ com\bgroceries\backend\entity\Stocks\Supplier$SupplierBuilder.class
 com\bgroceries\backend\entity\User$UserBuilder.class
 com\bgroceries\backend\service\SmsService.class
 com\bgroceries\backend\dto\ProductScaleDto.class
+com\bgroceries\backend\entity\Sale\Customer$CustomerBuilder.class
 com\bgroceries\backend\entity\Stocks\ReceiveLine$ReceiveLineBuilder.class
 com\bgroceries\backend\entity\Stocks\ReceiveDocument$ReceiveDocumentBuilder.class
 com\bgroceries\backend\dto\request\StatusUpdateRequest.class
@@ -157,9 +163,11 @@ com\bgroceries\backend\dto\ProductGroupDto$ProductGroupDtoBuilder.class
 com\bgroceries\backend\controller\Stocks\CategoryController.class
 com\bgroceries\backend\controller\Stocks\ProductGroupController.class
 com\bgroceries\backend\social\SocialVerifier.class
+com\bgroceries\backend\dto\CustomerGroupDto$CustomerGroupDtoBuilder.class
 com\bgroceries\backend\dto\ReceiveDocumentDto$ReceiveDocumentDtoBuilder.class
 com\bgroceries\backend\repository\ReceiveDocumentRepository.class
 com\bgroceries\backend\controller\Stocks\SerialNumberController.class
+com\bgroceries\backend\service\CustomerGroupService.class
 com\bgroceries\backend\dto\StockDocumentDto.class
 com\bgroceries\backend\entity\Stocks\SerialNumber$Status.class
 com\bgroceries\backend\entity\Stocks\SupplierGroup$SupplierGroupBuilder.class
@@ -167,6 +175,7 @@ com\bgroceries\backend\service\StockDocumentService$1.class
 com\bgroceries\backend\controller\Stocks\AdjustmentDocumentController.class
 com\bgroceries\backend\entity\Stocks\Category.class
 com\bgroceries\backend\controller\PasswordResetController$MessageResponse.class
+com\bgroceries\backend\entity\Sale\CustomerGroup.class
 com\bgroceries\backend\service\CategoryService.class
 com\bgroceries\backend\dto\request\VerifyOtpRequest.class
 com\bgroceries\backend\entity\PasswordResetOtp$PasswordResetOtpBuilder.class
@@ -200,6 +209,7 @@ com\bgroceries\backend\repository\OtpCodeRepository.class
 com\bgroceries\backend\dto\request\SocialLoginRequest.class
 com\bgroceries\backend\entity\Information\JobApplication.class
 com\bgroceries\backend\controller\PasswordResetController$ResetPasswordBody.class
+com\bgroceries\backend\repository\CustomerGroupRepository.class
 com\bgroceries\backend\dto\SupplierDto.class
 com\bgroceries\backend\dto\AdminUserDto.class
 com\bgroceries\backend\dto\JobApplicationDto$JobApplicationDtoBuilder.class
@@ -214,8 +224,10 @@ com\bgroceries\backend\dto\BrandDto.class
 com\bgroceries\backend\entity\ActivityLog.class
 com\bgroceries\backend\entity\Stocks\StockDocument$StockDocumentBuilder.class
 com\bgroceries\backend\dto\SerialNumberDto$SerialNumberDtoBuilder.class
+com\bgroceries\backend\repository\CustomerRepository.class
 com\bgroceries\backend\repository\ProductGroupRepository.class
 com\bgroceries\backend\controller\Stocks\SupplierController.class
+com\bgroceries\backend\dto\CustomerDto$CustomerDtoBuilder.class
 com\bgroceries\backend\dto\AdjustmentDocumentDto$Line.class
 com\bgroceries\backend\entity\Information\MemberDetail$MemberDetailBuilder.class
 com\bgroceries\backend\entity\Stocks\StockLine.class
@@ -237,6 +249,7 @@ com\bgroceries\backend\entity\Stocks\TransferLine.class
 com\bgroceries\backend\service\ProductService.class
 com\bgroceries\backend\dto\TransferDocumentDto.class
 com\bgroceries\backend\repository\LoginSessionRepository.class
+com\bgroceries\backend\entity\Sale\Customer.class
 com\bgroceries\backend\security\oauth\OAuth2LoginSuccessHandler.class
 com\bgroceries\backend\dto\response\OtpSentResponse$OtpSentResponseBuilder.class
 com\bgroceries\backend\entity\Stocks\UnitOfMeasure.class
@@ -256,6 +269,7 @@ com\bgroceries\backend\dto\IssueDocumentDto$Line$LineBuilder.class
 com\bgroceries\backend\entity\Stocks\Attribute$AttributeBuilder.class
 com\bgroceries\backend\entity\Stocks\IssueDocument$IssueDocumentBuilder.class
 com\bgroceries\backend\entity\Stocks\SerialNumber$SerialNumberBuilder.class
+com\bgroceries\backend\entity\Sale\CustomerGroup$CustomerGroupBuilder.class
 com\bgroceries\backend\controller\Information\JobController.class
 com\bgroceries\backend\service\AttributeChangeLogService.class
 com\bgroceries\backend\dto\response\OtpSentResponse.class

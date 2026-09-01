@@ -15,6 +15,8 @@ D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\OAuth2DiagnosticController.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\OAuth2TestController.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\PasswordResetController.java
+D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\Sale\CustomerController.java
+D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\Sale\CustomerGroupController.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\Stocks\AdjustmentDocumentController.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\Stocks\AttributeChangeLogController.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\controller\Stocks\AttributeController.java
@@ -45,6 +47,8 @@ D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\BrandDto.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\CategoryDto.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\CostChangeLogDto.java
+D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\CustomerDto.java
+D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\CustomerGroupDto.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\IssueDocumentDto.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\JobApplicationDto.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\dto\JobDto.java
@@ -83,6 +87,8 @@ D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\LoginSession.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\OtpCode.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\PasswordResetOtp.java
+D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\Sale\Customer.java
+D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\Sale\CustomerGroup.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\Stocks\AdjustmentDocument.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\Stocks\AdjustmentLine.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\entity\Stocks\Attribute.java
@@ -122,6 +128,8 @@ D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\BrandRepository.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\CategoryRepository.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\CostChangeLogRepository.java
+D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\CustomerGroupRepository.java
+D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\CustomerRepository.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\IssueDocumentRepository.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\JobApplicationRepository.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\repository\JobRepository.java
@@ -160,6 +168,8 @@ D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\service\BrandService.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\service\CategoryService.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\service\CostChangeLogService.java
+D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\service\CustomerGroupService.java
+D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\service\CustomerService.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\service\EmailService.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\service\impl\ConsoleSmsServiceImpl.java
 D:\1.B.Groceries\Website\Backend\B-backend\src\main\java\com\bgroceries\backend\service\impl\SmtpEmailServiceImpl.java

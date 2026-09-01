@@ -73,7 +73,8 @@ public class ReceiveDocument {
         LocalDateTime now = LocalDateTime.now();
         this.createdAt = now;
         this.updatedAt = now;
-        if (this.status == null) this.status = "Received";
+        if (this.status == null)
+            this.status = "Received";
     }
 
     @PreUpdate
