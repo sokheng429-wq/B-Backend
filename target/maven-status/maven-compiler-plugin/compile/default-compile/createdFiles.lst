@@ -60,6 +60,7 @@ com\bgroceries\backend\entity\Stocks\AdjustmentLine$AdjustmentLineBuilder.class
 com\bgroceries\backend\entity\Stocks\ProductScale$ProductScaleBuilder.class
 com\bgroceries\backend\dto\CustomerDto.class
 com\bgroceries\backend\dto\AdminUserDto$AdminUserDtoBuilder.class
+com\bgroceries\backend\controller\Sale\CustomerRefundController.class
 com\bgroceries\backend\entity\Stocks\PriceHistory$PriceHistoryBuilder.class
 com\bgroceries\backend\entity\Stocks\StockDocument$DocType.class
 com\bgroceries\backend\dto\ReturnInvoiceDto.class
@@ -84,6 +85,7 @@ com\bgroceries\backend\entity\Stocks\Supplier$SupplierBuilder.class
 com\bgroceries\backend\entity\Sale\SalePromotion$SalePromotionBuilder.class
 com\bgroceries\backend\dto\ProductScaleDto.class
 com\bgroceries\backend\entity\Sale\Customer$CustomerBuilder.class
+com\bgroceries\backend\service\impl\CustomerRefundServiceImpl.class
 com\bgroceries\backend\controller\Stocks\IssueDocumentController.class
 com\bgroceries\backend\controller\OAuth2DiagnosticController.class
 com\bgroceries\backend\config\SecurityConfig.class
@@ -300,6 +302,7 @@ com\bgroceries\backend\BackendApplication.class
 com\bgroceries\backend\entity\Stocks\Product.class
 com\bgroceries\backend\entity\Stocks\TransferDocument$DocType.class
 com\bgroceries\backend\entity\Stocks\TransferLine.class
+com\bgroceries\backend\repository\CustomerRefundRepository.class
 com\bgroceries\backend\security\oauth\OAuth2LoginSuccessHandler.class
 com\bgroceries\backend\dto\response\OtpSentResponse$OtpSentResponseBuilder.class
 com\bgroceries\backend\repository\PriceHistoryRepository.class
