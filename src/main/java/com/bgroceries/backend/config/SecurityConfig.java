@@ -1,6 +1,9 @@
 package com.bgroceries.backend.config;
 
+import com.bgroceries.backend.security.CustomAccessDeniedHandler;
+import com.bgroceries.backend.security.CustomAuthenticationEntryPoint;
 import com.bgroceries.backend.security.JwtAuthFilter;
+import com.bgroceries.backend.security.RateLimitFilter;
 import com.bgroceries.backend.security.oauth.CustomOAuth2UserService;
 import com.bgroceries.backend.security.oauth.OAuth2LoginFailureHandler;
 import com.bgroceries.backend.security.oauth.OAuth2LoginSuccessHandler;
@@ -17,6 +20,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 
 @Configuration
 @EnableWebSecurity
@@ -25,6 +29,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final RateLimitFilter rateLimitFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
@@ -38,20 +45,30 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults()) // uses the CorsConfigurationSource bean from CorsConfig
-                // OAuth2 login requires sessions to store authorization requests.
-                // We use IF_REQUIRED so sessions are only created for OAuth2, not for JWT API calls.
+                .cors(Customizer.withDefaults())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
+                )
+                .headers(headers -> headers
+                        .contentTypeOptions(Customizer.withDefaults())
+                        .xssProtection(Customizer.withDefaults())
+                        .referrerPolicy(referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                        .httpStrictTransportSecurity(hsts -> hsts
+                                .includeSubDomains(true)
+                                .maxAgeInSeconds(31536000))
+                        .frameOptions(frame -> frame.sameOrigin())
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/telegram/webhook").permitAll()  // Telegram bot webhook
-                        .requestMatchers("/api/oauth2/**").permitAll()  // OAuth2 test endpoints
-                        .requestMatchers("/api/public/**").permitAll()  // public team directory (safe fields only)
-                        .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/oauth2/**").permitAll()  // OAuth2 endpoints
-                        .requestMatchers("/login/oauth2/code/**").permitAll()  // OAuth2 callback
-                        .requestMatchers("/oauth-test.html").permitAll()  // OAuth2 test page
+                        .requestMatchers("/api/telegram/webhook").permitAll()
+                        .requestMatchers("/api/oauth2/config").permitAll()
+                        .requestMatchers("/api/oauth2/diagnostic/**").hasRole("ADMIN")
+                        .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/oauth2/**").permitAll()
+                        .requestMatchers("/login/oauth2/code/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -62,7 +79,7 @@ public class SecurityConfig {
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
                 )
-                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

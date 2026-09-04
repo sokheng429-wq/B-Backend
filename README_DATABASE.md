@@ -59,7 +59,7 @@ Follow these simple steps to generate an interactive visual ER diagram:
 | **Inventory Operations** | 10 | `stock_document`, `adjustment_document`, `transfer_document`, `issue_document` | Physical warehouse stock transfers, audits, damages, receipts, and line items |
 | **Sales & Invoices** | 15 | `customer`, `sale_invoice`, `sale_order`, `quotation`, `web_order`, `aging_invoices` | Point-of-sale invoices, customer terms, credit aging, quotations, and web store |
 | **AR & Refunds** | 10 | `ar_collections`, `customer_deposits`, `customer_refunds`, `consignments`, `return_invoice` | Accounts receivable settlements, cash deposits, credit refunds, consignments |
-| **Purchase Management** | 2 | `requisitions`, `requisition_items` | Internal department stock requests, approval workflows, PO conversions |
+| **Purchase Management** | 8 | `requisitions`, `requisition_items`, `purchase_orders`, `purchase_order_items`, `receipt_pos`, `receipt_po_items`, `return_receipt_pos`, `return_receipt_po_items` | Full procurement lifecycle: Requisitions, POs, Receipt POs, and Return Receipt POs |
 
 ---
 
@@ -79,7 +79,7 @@ graph TD
     Stock["Warehouse Stock Movements (transfer, adjust, issue)"]:::inv
     Sales["Sales & Invoices (order, invoice, quotation)"]:::sale
     AR["AR Collections & Customer Refunds"]:::ar
-    Purch["Purchase Requisitions (requisition, items)"]:::purch
+    Purch["Purchase Hub (Requisition, PO, Receipt PO, Return PO)"]:::purch
 
     Users -->|Audits & Logs| Sales
     Users -->|Auth & Action Log| Purch
@@ -90,7 +90,8 @@ graph TD
     Catalog -->|Procurement Request| Purch
 
     Sales -->|Debt & Balance| AR
-    Purch -->|Convert to PO / Stock In| Stock
+    Purch -->|Convert to PO / Receive Stock| Stock
+    Purch -->|Return Damaged Goods| Stock
 ```
 
 ---
@@ -203,6 +204,70 @@ Table password_reset_otps {
   created_at timestamp [not null]
 }
 
+Table purchase_orders {
+  id bigint [primary key, increment]
+  code varchar [not null, unique]
+  date date
+  require_date date
+  purchase_person varchar
+  supplier varchar
+  supplier_id bigint
+  phone varchar
+  reference varchar
+  voided_date date
+  so_code varchar
+  username varchar
+  outlet varchar
+  payment_term varchar
+  shipment_method varchar
+  template_name varchar
+  note varchar
+  billing_address varchar
+  shipping_address varchar
+  carrier varchar
+  tracking_number varchar
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table purchase_order_items {
+  id bigint [primary key, increment]
+  purchase_order_id bigint [not null]
+  product_id bigint
+  item_code varchar
+  barcode varchar
+  description varchar
+  description2 varchar
+  product_group varchar
+  uom varchar
+}
+
+Table receipt_pos {
+  id bigint [primary key, increment]
+  receipt_po_code varchar [not null, unique]
+  po_code varchar
+  date date
+  supplier varchar
+  supplier_id bigint
+  outlet varchar
+  shipment varchar
+  username varchar
+  reference varchar
+  note varchar
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table receipt_po_items {
+  id bigint [primary key, increment]
+  receipt_po_id bigint [not null]
+  product_id bigint
+  code varchar
+  barcode varchar
+  description varchar
+  uom varchar
+}
+
 Table requisitions {
   id bigint [primary key, increment]
   code varchar [not null, unique]
@@ -221,6 +286,33 @@ Table requisitions {
 Table requisition_items {
   id bigint [primary key, increment]
   requisition_id bigint [not null]
+  product_id bigint
+  code varchar
+  barcode varchar
+  description varchar
+  uom varchar
+}
+
+Table return_receipt_pos {
+  id bigint [primary key, increment]
+  return_po_code varchar [not null, unique]
+  po_code varchar
+  receipt_po_code varchar
+  date date
+  supplier varchar
+  supplier_id bigint
+  outlet varchar
+  username varchar
+  reason varchar
+  reference varchar
+  note varchar
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table return_receipt_po_items {
+  id bigint [primary key, increment]
+  return_receipt_po_id bigint [not null]
   product_id bigint
   code varchar
   barcode varchar
@@ -997,7 +1089,10 @@ Table users {
 // =========================================================================
 
 Ref: job_application.job_id > job.id // many-to-one
+Ref: purchase_order_items.purchase_order_id > purchase_orders.id // many-to-one
+Ref: receipt_po_items.receipt_po_id > receipt_pos.id // many-to-one
 Ref: requisition_items.requisition_id > requisitions.id // many-to-one
+Ref: return_receipt_po_items.return_receipt_po_id > return_receipt_pos.id // many-to-one
 Ref: ar_collection_invoices.ar_collection_id > ar_collections.id // many-to-one
 Ref: consignment_items.consignment_id > consignments.id // many-to-one
 Ref: customer_refund_invoices.customer_refund_id > customer_refunds.id // many-to-one
@@ -1065,6 +1160,12 @@ Ref: customer_refunds.customer_id > customer.id
 Ref: customer_refund_invoices.customer_refund_id > customer_refunds.id
 Ref: requisition_items.requisition_id > requisitions.id
 Ref: requisition_items.product_id > product.id
+Ref: purchase_orders.supplier_id > supplier.id
+Ref: purchase_order_items.purchase_order_id > purchase_orders.id
+Ref: purchase_order_items.product_id > product.id
+Ref: receipt_pos.supplier_id > supplier.id
+Ref: receipt_po_items.receipt_po_id > receipt_pos.id
+Ref: receipt_po_items.product_id > product.id
 
 // =========================================================================
 // TABLE GROUPS FOR DBDATABASE.IO CANVAS
@@ -1086,8 +1187,17 @@ TableGroup Information_And_HR {
 }
 
 TableGroup Purchase_Management {
+  purchase_orders
+  purchase_order_items
+  receipt_pos
+  receipt_po_items
   requisitions
   requisition_items
+}
+
+TableGroup General {
+  return_receipt_pos
+  return_receipt_po_items
 }
 
 TableGroup Sales_And_Invoices {
@@ -1184,11 +1294,61 @@ Records requisitions(id, code, date, require_date, requisition_type, requisition
   2, 'REQ-20260904-0002', '2026-09-04', '2026-09-12', 'Urgent Restock', 820.50, 'ManagerJohn', 'COMPLETED'
 }
 
-Records requisition_items(id, requisition_id, code, barcode, description, requisition_qty, uom, cost, total) {
-  1, 1, 'BEV-CC-001', '8850123000124', 'Coca Cola 330ml Can', 100, 'Can', 0.45, 45.00
-  2, 1, 'SNK-PO-002', '8850123000230', 'Lays Classic 50g', 200, 'Pcs', 1.10, 220.00
+Records purchase_orders(id, code, date, require_date, purchase_person, supplier, grand_total, balance, status, username, outlet) {
+  1, 'PO-20260904-0001', '2026-09-04', '2026-09-11', 'Badmin', 'Farm Pure Dairy', 850.00, 150.00, 'COMPLETED', 'Badmin', 'Main Store Warehouse'
+  2, 'PO-20260904-0002', '2026-09-04', '2026-09-12', 'ManagerJohn', 'Cambodia Beverage Co.', 1200.00, 0.00, 'OPEN', 'Badmin', 'Central Cold Storage'
 }
+
+Records purchase_order_items(id, purchase_order_id, item_code, barcode, description, qty, cost, total) {
+  1, 1, 'PRD-001', '885012345678', 'Fresh Whole Milk 1L', 120, 1.50, 180.00
+}
+
+Records receipt_pos(id, receipt_po_code, po_code, date, supplier, balance, amount, qty, status, outlet, shipment, username) {
+  1, 'REC-20260904-0001', 'PO-20260904-0001', '2026-09-04', 'Farm Pure Dairy', 150.00, 850.00, 120, 'RECEIVED', 'Main Store Warehouse', 'Standard Trucking', 'Badmin'
+}
+
+Records receipt_po_items(id, receipt_po_id, code, barcode, description, qty, uom, cost, total) {
+  1, 1, 'PRD-001', '885012345678', 'Fresh Whole Milk 1L', 120, 'Bottle', 1.50, 180.00
+}
+
 ```
 
 ---
 *Created for B'Groceries Supermarket ERP system. Ready for integration with dbdiagram.io.*
+
+### `shipment_tariffs` (Freight Management Hub - Shipment Tariff)
+| Column | Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | BIGINT | PRIMARY KEY, AUTO_INCREMENT | Unique identifier |
+| `code` | VARCHAR(60) | NOT NULL, UNIQUE | Auto-generated tariff code (`ST-YYYYMMDD-XXXX`) |
+| `description` | VARCHAR(255) | NOT NULL | Primary description of the tariff |
+| `second_language` | VARCHAR(255) | NULLABLE | Secondary / Khmer translation |
+| `supplier_id` | BIGINT | FOREIGN KEY (`suppliers.id`) | Linked supplier ID |
+| `supplier` | VARCHAR(150) | NULLABLE | Supplier business/company name |
+| `active` | BOOLEAN | NOT NULL, DEFAULT true | Active status toggle |
+| `created_at` | TIMESTAMP | NOT NULL | Creation timestamp |
+| `updated_at` | TIMESTAMP | NOT NULL | Last update timestamp |
+
+### `shipment_methods` (Freight Management Hub - Shipment Method)
+| Column | Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | BIGINT | PRIMARY KEY, AUTO_INCREMENT | Unique identifier |
+| `code` | VARCHAR(60) | NOT NULL, UNIQUE | Auto-generated method code (`SM-YYYYMMDD-XXXX`) |
+| `description` | VARCHAR(255) | NOT NULL | Method title (e.g. Express Motorbike, Cold-Chain Truck) |
+| `second_language` | VARCHAR(255) | NULLABLE | Secondary / Khmer translation |
+| `cost_proration` | VARCHAR(50) | NOT NULL, DEFAULT 'VALUE' | Cost proration rule (`VALUE` or `QTY`) |
+| `active` | BOOLEAN | NOT NULL, DEFAULT true | Active status toggle |
+| `created_at` | TIMESTAMP | NOT NULL | Creation timestamp |
+| `updated_at` | TIMESTAMP | NOT NULL | Last update timestamp |
+
+### `shipment_method_tariffs` (Join Table)
+| Column | Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `shipment_method_id` | BIGINT | FOREIGN KEY (`shipment_methods.id`) | Linked Shipment Method ID |
+| `shipment_tariff_id` | BIGINT | FOREIGN KEY (`shipment_tariffs.id`) | Linked Shipment Tariff ID |
+
+### Cash Operations (`cash_operations`)
+- **Module**: Cash Book Hub - Operation Cash / Cash In & Out
+- **Table**: `cash_operations`
+- **Columns**: `id`, `code`, `transaction_date`, `type` (CASH_IN / CASH_OUT), `party_type` (CUSTOMER / SUPPLIER / OTHER), `party_name`, `amount`, `outlet`, `status` (NON_VOIDED / VOIDED), `category`, `reference_no`, `description`, `username`, `created_at`, `updated_at`.
+- **Description**: Stores daily store cash intakes, customer downpayment receipts, petty cash disbursements, and vendor payments.

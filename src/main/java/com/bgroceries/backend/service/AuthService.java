@@ -21,7 +21,7 @@ import com.bgroceries.backend.security.JwtUtil;
 import com.bgroceries.backend.security.TokenActivityStore;
 import com.bgroceries.backend.social.SocialProfile;
 import com.bgroceries.backend.social.SocialVerifier;
-import com.bgroceries.backend.util.PhoneUtil;
+import com.bgroceries.backend.helper.PhoneUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 

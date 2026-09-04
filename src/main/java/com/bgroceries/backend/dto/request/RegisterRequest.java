@@ -34,7 +34,8 @@ public class RegisterRequest {
     private String phoneNumber;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 6, max = 100, message = "Password must be at least 6 characters")
+    @Size(min = 8, max = 100, message = "Password must be at least 8 characters long")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).*$", message = "Password must contain at least one letter and one number")
     private String password;
 
     @NotBlank(message = "Confirm password is required")

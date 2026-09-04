@@ -8,7 +8,7 @@ import com.bgroceries.backend.exception.BadRequestException;
 import com.bgroceries.backend.exception.ConflictException;
 import com.bgroceries.backend.repository.UserRepository;
 import com.bgroceries.backend.security.JwtUtil;
-import com.bgroceries.backend.util.PhoneUtil;
+import com.bgroceries.backend.helper.PhoneUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

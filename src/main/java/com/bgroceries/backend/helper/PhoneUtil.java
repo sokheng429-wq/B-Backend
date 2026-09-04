@@ -1,4 +1,4 @@
-package com.bgroceries.backend.util;
+package com.bgroceries.backend.helper;
 
 /**
  * Normalizes Cambodian phone numbers to a single canonical format (+855XXXXXXXXX)

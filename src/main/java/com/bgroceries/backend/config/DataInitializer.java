@@ -2,7 +2,7 @@ package com.bgroceries.backend.config;
 
 import com.bgroceries.backend.entity.User;
 import com.bgroceries.backend.repository.UserRepository;
-import com.bgroceries.backend.util.PhoneUtil;
+import com.bgroceries.backend.helper.PhoneUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;

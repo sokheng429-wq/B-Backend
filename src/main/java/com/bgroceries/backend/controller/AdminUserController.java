@@ -7,7 +7,7 @@ import com.bgroceries.backend.exception.BadRequestException;
 import com.bgroceries.backend.exception.ConflictException;
 import com.bgroceries.backend.exception.NotFoundException;
 import com.bgroceries.backend.repository.UserRepository;
-import com.bgroceries.backend.util.PhoneUtil;
+import com.bgroceries.backend.helper.PhoneUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

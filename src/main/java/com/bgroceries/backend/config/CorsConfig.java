@@ -9,8 +9,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
- * Central CORS setup. Only the frontend origins are allowed to call this API:
- * the Vite dev server (http://localhost:5173) and the production frontend domain.
+ * Hardened CORS configuration.
+ * Only verified frontend origins are allowed to call this API.
  */
 @Configuration
 public class CorsConfig {
@@ -19,13 +19,29 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of(
-                "http://localhost:5173",    // Vite dev server (HTTP)
-                "https://localhost:5173"   // Vite dev server (HTTPS for Facebook login)                  
-                // , "https://your-frontend-domain.com"  // uncomment with your real prod domain
+                "http://localhost:5173",
+                "https://localhost:5173",
+                "http://localhost:3000",
+                "http://localhost:8080"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedHeaders(List.of(
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "Origin",
+                "X-Requested-With",
+                "Access-Control-Request-Method",
+                "Access-Control-Request-Headers"
+        ));
+        configuration.setExposedHeaders(List.of(
+                "Authorization",
+                "Content-Disposition",
+                "Retry-After",
+                "X-Total-Count"
+        ));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L); // Pre-flight cache duration: 1 hour
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
